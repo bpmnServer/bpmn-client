@@ -1,6 +1,6 @@
 {
   "name": "bpmn-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "scripts": {
     "build": "tsc --build",
@@ -12,7 +12,7 @@
     "wintest": "node_modules/.bin/mocha",
     "toc": "node scripts/generate-api-toc ./docs/API.md,./docs/Examples.md",
     "test-md": "node scripts/test-markdown.js ./docs/API.md && node scripts/test-markdown.js ./docs/Examples.md"
-    },
+  },
   "description": "bpmn-server.webApp",
   "keywords": [
     "BPMN",
