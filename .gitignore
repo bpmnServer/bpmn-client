@@ -1,0 +1,16 @@
+﻿/node_modules
+/obj
+*.log
+*.cmd
+*.sln
+*.njsproj
+*.njsproj.user
+*.txt
+/bin
+*.log
+*.cmd
+*.sln
+*.njsproj
+*.njsproj.user
+*.txt
+/bin
