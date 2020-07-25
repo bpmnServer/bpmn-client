@@ -14,7 +14,8 @@ test();
 function test() {
     return __awaiter(this, void 0, void 0, function* () {
         const client = new BPMNClient_1.BPMNClient('bpmn.omniworkflow.com', 80);
-        client.engine.start({ name: "Buy Used Car", data: {} });
+        const ret = yield client.engine.start({ name: "Buy Used Car", data: {} });
+        console.log(ret);
     });
 }
 //# sourceMappingURL=index.js.map

@@ -1,7 +1,7 @@
 {
-  "name": "bpmn-server.webapp",
-  "version": "0.0.0",
-  "private": true,
+  "name": "bpmn-client",
+  "version": "1.0.0",
+  "license": "MIT",
   "scripts": {
     "build": "tsc --build",
     "clean": "tsc --build --clean",
@@ -12,10 +12,21 @@
     "wintest": "node_modules/.bin/mocha",
     "toc": "node scripts/generate-api-toc ./docs/API.md,./docs/Examples.md",
     "test-md": "node scripts/test-markdown.js ./docs/API.md && node scripts/test-markdown.js ./docs/Examples.md"
-  },
+    },
   "description": "bpmn-server.webApp",
+  "keywords": [
+    "BPMN",
+    "BPMN 2.0",
+    "Workflow",
+    "Node.js",
+    "TypeScript"
+  ],
   "author": {
-    "name": ""
+    "name": "ralphhanna"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https:github.com/ralphhanna/bpmn-server.git"
   },
   "dependencies": {
     "bpmn-server": "^1.0.0",
