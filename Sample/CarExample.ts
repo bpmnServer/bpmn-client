@@ -1,27 +1,33 @@
-import { BPMNClient } from './';
+import { BPMNClient } from "bpmn-client";
 
-
-console.log("Testing BPMNClient");
 const dotenv = require('dotenv');
 const res = dotenv.config();
 
-console.log(res);
+console.log("Testing BPMNClient 3");
+
+const http = require('http');
+
+    
 test();
 
 async function test() {
 
-    const server= new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
-    const caseId = 3040;
+    const API_KEY = '12345';
+    const HOST = 'test.omniworkflow.com';
+    const PORT = '443';
+    const BASE_URL = 'api';
 
-    var defs = await server.definitions.list();
 
-    console.log(defs);
-    var def = await server.definitions.load('Buy Used Car');
+    console.log('-------- car.js -----------');
 
-    console.log(def['elements']);
 
-    //var instance = await server.engine.start("Buy Used Car", {});
+    const server = new BPMNClient(HOST, PORT, API_KEY);
+
+    var caseId = Math.floor(Math.random() * 10000);
+
+    let name = 'Buy Used Car';
+    let instanceId;
 
     var instance = await server.engine.start("Buy Used Car", { caseId: caseId });
 
@@ -96,5 +102,3 @@ async function test() {
     });
 
 }
-
-

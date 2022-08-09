@@ -1,5 +1,5 @@
 {
-  "name": "bpmn-client",
+  "name": "bpmn-client-sample",
   "version": "1.2.0",
   "license": "MIT",
   "scripts": {
@@ -24,11 +24,8 @@
   "author": {
     "name": "ralphhanna"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https:github.com/ralphhanna/bpmn-client.git"
-  },
   "dependencies": {
+    "bpmn-client": "*",
     "connect-busboy": "0.0.2",
     "core-js": "^3.6.5",
     "dotenv": "^16.0.1"
@@ -42,6 +39,6 @@
     "typescript": "^3.9.7"
   },
   "engines": {
-    "node": "^12.0.0"
+    "node": "^14.0.0"
   }
 }

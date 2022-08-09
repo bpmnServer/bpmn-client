@@ -12,6 +12,6 @@
     "**/*.ts"
   ],
   "exclude": [
-    "node_modules" , "Sample"
+    "node_modules" 
   ]
 }
