@@ -9,12 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const src_1 = require("bpmn-client/src/");
+const bpmn_client_1 = require("bpmn-client");
+console.log("Testing BPMNClient");
+const dotenv = require('dotenv');
+const res = dotenv.config();
 console.log("Testing BPMNClient");
 test();
 function test() {
     return __awaiter(this, void 0, void 0, function* () {
-        const client = new src_1.BPMNClient('localhost', 3000, 12345);
+        //const client = new BPMNClient('localhost', 3000,12345);
+        const client = new bpmn_client_1.BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
         var instance = yield client.engine.start("Buy Used Car", {});
         console.log("instance.id", instance.id, instance.name, instance.status);
         var insts = yield client.datastore.findInstances({ 'status': 'running' });
@@ -27,4 +31,3 @@ function test() {
         });
     });
 }
-//# sourceMappingURL=test.js.map

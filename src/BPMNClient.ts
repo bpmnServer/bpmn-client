@@ -8,6 +8,7 @@ const http = require('http');
 class WebService {
     statusCode;
     result;
+    response;
     constructor() { }
     async invoke(params, options) {
 
@@ -25,6 +26,7 @@ class WebService {
 
                 driver.request(options, function (res) {
                     console.log('STATUS: ' + res.statusCode);
+                    this.response = res;
                     //console.log(res);
                     self.statusCode = res.statusCode;
                     res.setEncoding('utf8');
@@ -130,8 +132,9 @@ class ClientEngine {
     constructor(client) {
         this.client = client;
     }
-    async start(name, data): Promise<IInstanceData> {
-        const ret = await this.client.post('engine/start', { name, data });
+    async start(name, data = {} , startNodeId = null, options = {}): Promise<IInstanceData> {
+        const ret = await this.client.post('engine/start',
+            { name, data, startNodeId, options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
@@ -174,6 +177,14 @@ class ClientEngine {
         }
         const instance = ret['instance'] as IInstanceData;
         return instance;
+    }
+    async status() {
+        const ret = await this.client.get('engine/status', {});
+        if (ret['errors']) {
+            console.log(ret['errors']);
+            throw new Error(ret['errors']);
+        }
+        return ret;
     }
 }
 class ClientDatastore {

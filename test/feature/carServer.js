@@ -3,10 +3,10 @@ const {  BPMNClient } = require("../../src/");
 
 
 const API_KEY = '12345';
-//const HOST = 'localhost';
-//const PORT = '3000';
-const HOST = 'test.omniworkflow.com';
-const PORT = '443';
+const HOST = 'localhost';
+const PORT = '3000';
+//const HOST = 'test.omniworkflow.com';
+//const PORT = '443';
 
 const BASE_URL = 'api';
 
@@ -89,6 +89,11 @@ Feature('Buy Used Car- clean and repair', () => {
 
         });
 
+        and('find engine status', async () => {
+
+            var insts = await server.engine.status();
+ 
+        });
 
         // 
         and('find instances', async () => {

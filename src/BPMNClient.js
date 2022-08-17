@@ -10,8 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientDefinitions = exports.ClientDatastore = exports.ClientEngine = exports.BPMNClient = void 0;
-const dotenv = require('dotenv');
-const res = dotenv.config();
 console.log("BPMNClient 1.2");
 const https = require('https');
 const http = require('http');
@@ -30,6 +28,7 @@ class WebService {
                 try {
                     driver.request(options, function (res) {
                         console.log('STATUS: ' + res.statusCode);
+                        this.response = res;
                         //console.log(res);
                         self.statusCode = res.statusCode;
                         res.setEncoding('utf8');
@@ -120,9 +119,9 @@ class ClientEngine {
     constructor(client) {
         this.client = client;
     }
-    start(name, data) {
+    start(name, data = {}, startNodeId = null, options = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ret = yield this.client.post('engine/start', { name, data });
+            const ret = yield this.client.post('engine/start', { name, data, startNodeId, options });
             if (ret['errors']) {
                 console.log(ret['errors']);
                 throw new Error(ret['errors']);
@@ -142,6 +141,26 @@ class ClientEngine {
             return instance;
         });
     }
+    throwMessage(messageId, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ret = yield this.client.put('engine/throwMessage', { "messageId": messageId, "data": data });
+            if (ret['errors']) {
+                console.log(ret['errors']);
+                throw new Error(ret['errors']);
+            }
+            return ret;
+        });
+    }
+    throwSignal(signalId, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ret = yield this.client.put('engine/throwSignal', { "signalId": signalId, "data": data });
+            if (ret['errors']) {
+                console.log(ret['errors']);
+                throw new Error(ret['errors']);
+            }
+            return ret;
+        });
+    }
     get(query) {
         return __awaiter(this, void 0, void 0, function* () {
             const ret = yield this.client.get('engine/get', query);
@@ -151,6 +170,16 @@ class ClientEngine {
             }
             const instance = ret['instance'];
             return instance;
+        });
+    }
+    status() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ret = yield this.client.get('engine/status', {});
+            if (ret['errors']) {
+                console.log(ret['errors']);
+                throw new Error(ret['errors']);
+            }
+            return ret;
         });
     }
 }

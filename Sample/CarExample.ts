@@ -13,17 +13,10 @@ test();
 async function test() {
 
 
-    const API_KEY = '12345';
-    const HOST = 'test.omniworkflow.com';
-    const PORT = '443';
-    const BASE_URL = 'api';
-
-
     console.log('-------- car.js -----------');
 
-
-    const server = new BPMNClient(HOST, PORT, API_KEY);
-
+    
+    const server= new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
     var caseId = Math.floor(Math.random() * 10000);
 
     let name = 'Buy Used Car';

@@ -1,17 +1,14 @@
 {
   "name": "bpmn-client",
-  "version": "1.2.1",
+  "version": "1.2.5",
   "license": "MIT",
   "scripts": {
     "build": "tsc --build",
+    "compileRun": "tsc --build && node app.js",
+    "dev": "nodemon -e ts  --exec \"npm run compileRun\"",
     "clean": "tsc --build --clean",
-    "start": "node app.ts",
-    "test": "mocha -R dot",
-    "posttest": "eslint . --cache && npm run toc",
-    "wintest": "node_modules/.bin/mocha",
-    "start:watch": "tsc-watch --project . --onSuccess \"nodemon ./test.ts\"",
-    "toc": "node scripts/generate-api-toc ./docs/API.md,./docs/Examples.md",
-    "test-md": "node scripts/test-markdown.js ./docs/API.md && node scripts/test-markdown.js ./docs/Examples.md"
+    "start": "node test.ts",
+    "test": "mocha -exit --config=test\\.mocharc.json"
   },
   "description": "Client API for BPMN-Server webservices",
   "keywords": [
@@ -42,6 +39,7 @@
     "typescript": "^3.9.7"
   },
   "engines": {
-    "node": "^12.0.0"
+    "node": ">=12.0.0"
+
   }
 }

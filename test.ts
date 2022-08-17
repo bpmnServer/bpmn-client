@@ -60,7 +60,17 @@ async function test() {
     }
 
 
+    
 
+    var items = await server.datastore.findItems({ "items.status": "end", "items.elementId": "task_Buy" });
+
+
+    items.forEach(item => {
+        console.log('item: id==>' + item.elementId, item.type, item.name, 'status==>', item.status);
+    });
+
+
+  
     var insts = await server.datastore.findInstances({ data: { caseId: caseId } });
 
     insts.forEach(inst => {
