@@ -19,7 +19,7 @@ class WebService {
         return __awaiter(this, void 0, void 0, function* () {
             var driver = http;
             var body = JSON.stringify(params);
-            console.log(options, params);
+            //        console.log(options, params);
             if (options.port == 443)
                 driver = https;
             let data = '';
@@ -27,7 +27,7 @@ class WebService {
             return new Promise(function (resolve, reject) {
                 try {
                     driver.request(options, function (res) {
-                        console.log('STATUS: ' + res.statusCode);
+                        //                    console.log('STATUS: ' + res.statusCode);
                         this.response = res;
                         //console.log(res);
                         self.statusCode = res.statusCode;
@@ -212,7 +212,7 @@ class ClientDatastore {
     }
     deleteInstances(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.client.del('datastore/delete', query);
+            return yield this.client.del('datastore/deleteInstances', query);
         });
     }
 }

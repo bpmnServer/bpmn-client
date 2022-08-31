@@ -9,24 +9,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const _1 = require("./");
-console.log("Testing BPMNClient");
+const bpmn_client_1 = require("bpmn-client");
 const dotenv = require('dotenv');
 const res = dotenv.config();
-console.log(res);
+console.log("Testing BPMNClient 3");
+const http = require('http');
 test();
 function test() {
     return __awaiter(this, void 0, void 0, function* () {
-        const server = new _1.BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
-        const caseId = 3040;
-        var delResp = yield server.datastore.deleteInstances({ name: 'Buy Used Car' });
-        //console.log(delResp);
-        //return;
-        var defs = yield server.definitions.list();
-        console.log(defs);
-        var def = yield server.definitions.load('Buy Used Car');
-        console.log(def['elements']);
-        //var instance = await server.engine.start("Buy Used Car", {});
+        console.log('-------- car.js -----------');
+        const server = new bpmn_client_1.BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+        var caseId = Math.floor(Math.random() * 10000);
+        let name = 'Buy Used Car';
+        let instanceId;
         var instance = yield server.engine.start("Buy Used Car", { caseId: caseId });
         console.log("instance.id", instance.id, instance.name, instance.status, instance.data.caseId);
         var response = yield server.engine.invoke({ id: instance.id, "items.elementId": 'task_Buy' }, { needsCleaning: "Yes", needsRepairs: "Yes" });
@@ -42,10 +37,6 @@ function test() {
         catch (exc) {
             console.log(exc);
         }
-        var items = yield server.datastore.findItems({ "items.status": "end", "items.elementId": "task_Buy" });
-        items.forEach(item => {
-            console.log('item: id==>' + item.elementId, item.type, item.name, 'status==>', item.status);
-        });
         var insts = yield server.datastore.findInstances({ data: { caseId: caseId } });
         insts.forEach(inst => {
             console.log('Inst for CaseId id==>' + inst.id, inst.name, inst.data.caseId, 'status==>', inst.status);
@@ -66,15 +57,6 @@ function test() {
         var items = yield server.datastore.findItems({ id: instance.id });
         items.forEach(item => {
             console.log('item: id==>' + item.elementId, item.type, item.name, 'status==>', item.status);
-        });
-    });
-}
-function delay(time, result) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise(function (resolve) {
-            setTimeout(function () {
-                resolve(result);
-            }, time);
         });
     });
 }

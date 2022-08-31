@@ -15,7 +15,7 @@ class WebService {
         var driver = http;
         var body = JSON.stringify(params);
 
-        console.log(options, params);
+//        console.log(options, params);
         if (options.port == 443)
             driver = https;
 
@@ -25,7 +25,7 @@ class WebService {
             try {
 
                 driver.request(options, function (res) {
-                    console.log('STATUS: ' + res.statusCode);
+//                    console.log('STATUS: ' + res.statusCode);
                     this.response = res;
                     //console.log(res);
                     self.statusCode = res.statusCode;
@@ -213,7 +213,7 @@ class ClientDatastore {
         return instances;
     }
     async deleteInstances(query) {
-        return await this.client.del('datastore/delete', query);
+        return await this.client.del('datastore/deleteInstances', query);
     }
 }
 class ClientDefinitions {

@@ -10,10 +10,14 @@ test();
 
 async function test() {
 
-    const server= new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+    const server = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
     const caseId = 3040;
 
+
+    var delResp = await server.datastore.deleteInstances({ name: 'Buy Used Car' });
+    //console.log(delResp);
+    //return;
     var defs = await server.definitions.list();
 
     console.log(defs);
@@ -60,7 +64,7 @@ async function test() {
     }
 
 
-    
+
 
     var items = await server.datastore.findItems({ "items.status": "end", "items.elementId": "task_Buy" });
 
@@ -70,7 +74,7 @@ async function test() {
     });
 
 
-  
+
     var insts = await server.datastore.findInstances({ data: { caseId: caseId } });
 
     insts.forEach(inst => {
@@ -104,7 +108,14 @@ async function test() {
     items.forEach(item => {
         console.log('item: id==>' + item.elementId, item.type, item.name, 'status==>', item.status);
     });
+}
 
+async function delay(time, result) {
+    return new Promise(function (resolve) {
+        setTimeout(function () {
+            resolve(result);
+        }, time);
+    });
 }
 
 
