@@ -34,9 +34,14 @@ class WebService {
                         data += chunk;
                     });
                     res.on('end', () => {
-                        self.result = JSON.parse(data);
-
-                        resolve(self.result);
+                        try {
+                            self.result = JSON.parse(data);
+                            resolve(self.result);
+                        }
+                        catch (exc) {
+                            console.log(data);
+                            console.log(exc);
+                        }
                     });
 
 
@@ -132,7 +137,7 @@ class ClientEngine {
     constructor(client) {
         this.client = client;
     }
-    async start(name, data = {} , startNodeId = null, options = {}): Promise<IInstanceData> {
+    async start(name, data = {}, startNodeId = null, options = {}): Promise<IInstanceData> {
         const ret = await this.client.post('engine/start',
             { name, data, startNodeId, options });
         if (ret['errors']) {
@@ -152,16 +157,16 @@ class ClientEngine {
         return instance;
     }
 
-    async throwMessage(messageId, data) {
-        const ret = await this.client.put('engine/throwMessage', { "messageId": messageId , "data": data });
+    async throwMessage(messageId, data = {} , messageMatchingKey = {}) {
+        const ret = await this.client.post('engine/throwMessage', { "messageId": messageId, "data": data, messageMatchingKey });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
         }
         return ret;
     }
-    async throwSignal(signalId, data) {
-        const ret = await this.client.put('engine/throwSignal', { "signalId": signalId, "data": data });
+    async throwSignal(signalId, data = {} , messageMatchingKey = {}) {
+        const ret = await this.client.post('engine/throwSignal', { "signalId": signalId, "data": data, messageMatchingKey });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);

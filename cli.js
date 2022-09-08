@@ -24,16 +24,23 @@ const question = function (q) {
     });
 };
 completeUserTask();
+function menu() {
+    console.log('Commands:');
+    console.log('	q	to quit');
+    console.log('	s	start process ');
+    console.log('	lo	list outstanding items');
+    console.log('	li	list items');
+    console.log('	l	list instances for a process');
+    console.log('	di	display Instance information');
+    console.log('	i	Invoke Task');
+    console.log('	sgl	Signal Task');
+    console.log('	msg	Message Task');
+    console.log('	d	delete instnaces');
+    console.log('	?	repeat this list');
+}
 function completeUserTask() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('Commands:');
-        console.log('	q	to quit');
-        console.log('	s	start process ');
-        console.log('	lo	list outstanding items');
-        console.log('	l	list instances for a process');
-        console.log('	di	display Instance information');
-        console.log('	i	invoke item');
-        console.log('	d	delete instnaces');
+        menu();
         let option = '';
         var command;
         while (option !== 'q') {
@@ -41,16 +48,23 @@ function completeUserTask() {
             let opts = command.split(' ');
             option = opts[0];
             switch (option) {
+                case '?':
+                    menu();
+                    break;
                 case 'lo':
-                    console.log("list outstanding items");
+                    console.log("Listing Outstanding Items");
                     yield findItems({ "items.status": "wait" });
                     break;
                 case 'l':
-                    console.log("list instances");
+                    console.log("Listing Instances for a Process");
                     yield listInstances();
                     break;
+                case 'li':
+                    console.log("list items");
+                    yield listItems();
+                    break;
                 case 'di':
-                    console.log("displaying ");
+                    console.log("Displaying Instance Details");
                     yield displayInstance();
                     break;
                 case 'i':
@@ -58,8 +72,16 @@ function completeUserTask() {
                     yield invoke();
                     break;
                 case 's':
-                    console.log("starting");
+                    console.log("Starting Process");
                     yield start();
+                    break;
+                case 'sgl':
+                    console.log("Signalling Process");
+                    yield signal();
+                    break;
+                case 'msg':
+                    console.log("Message Process");
+                    yield message();
                     break;
                 case 'd':
                     console.log("deleting");
@@ -75,14 +97,22 @@ function start() {
     return __awaiter(this, void 0, void 0, function* () {
         const name = yield question('Please provide your process name: ');
         let taskData = yield question('Please provide your Task Data (json obj) if any: ');
-        if (taskData === "") {
-            taskData = {};
+        console.log(taskData);
+        try {
+            if (taskData === "") {
+                taskData = {};
+            }
+            else {
+                taskData = JSON.parse(taskData.toString());
+            }
         }
-        else {
-            taskData = JSON.parse(taskData.toString());
+        catch (exc) {
+            console.log(exc);
+            return;
         }
         let response = yield server.engine.start(name, taskData);
-        console.log("Process " + name + " started:", response.items, 'InstanceId', response.id);
+        console.log("Process " + name + " started:", 'InstanceId', response.id);
+        return yield displayInstance(response.id);
     });
 }
 function findItems(query) {
@@ -92,6 +122,26 @@ function findItems(query) {
         for (var i = 0; i < items.length; i++) {
             let item = items[i];
             console.log(`${item.name} - ${item.elementId}	instanceId:	${item['instanceId']}`);
+        }
+    });
+}
+function listItems() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const answer = yield question('Please items criteria name value pair; example: items.status wait ');
+        let str = '' + answer;
+        const list = str.split(' ');
+        let criteria = {};
+        console.log(list);
+        for (var i = 0; i < list.length; i += 2) {
+            console.log(list[i], list[i + 1]);
+            criteria[list[i]] = list[i + 1];
+        }
+        console.log(criteria);
+        var items = yield server.datastore.findItems(criteria);
+        console.log(items.length);
+        for (var j = 0; j < items.length; j++) {
+            let item = items[j];
+            console.log(`element: ${item.elementId} status: ${item.status}  processName: ${item['processName']} InstanceId: ${item['instanceId']}	id:	${item.id}`);
         }
     });
 }
@@ -106,9 +156,10 @@ function listInstances() {
         }
     });
 }
-function displayInstance() {
+function displayInstance(instanceId = null) {
     return __awaiter(this, void 0, void 0, function* () {
-        const instanceId = yield question('Please provide your Instance ID: ');
+        if (instanceId == null)
+            instanceId = yield question('Please provide your Instance ID: ');
         let insts = yield server.datastore.findInstances({ id: instanceId });
         for (var i = 0; i < insts.length; i++) {
             let inst = insts[i];
@@ -135,7 +186,8 @@ function invoke() {
         }
         try {
             let response = yield server.engine.invoke({ id: instanceId, "items.elementId": taskId }, taskData);
-            console.log("Completed UserTask:", taskId, response.items);
+            console.log("Completed UserTask:", taskId);
+            return yield displayInstance(response.id);
         }
         catch (exc) {
             console.log("Invoking task failed for:", taskId, instanceId);
@@ -143,9 +195,49 @@ function invoke() {
         }
     });
 }
+function signal() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const signalId = yield question('Please provide signal ID: ');
+        let signalData = yield question('Please provide your Data (json obj) if any: ');
+        //if (typeof signalData === 'string' && signalData.trim() === '') {
+        if (signalData === "") {
+            signalData = {};
+        }
+        else {
+            try {
+                signalData = JSON.parse(signalData.toString());
+            }
+            catch (exc) {
+                console.log(exc);
+                return;
+            }
+        }
+        let response = yield server.engine.throwSignal(signalId, signalData);
+        console.log("Signal Response:", response);
+    });
+}
+function message() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const messageId = yield question('Please provide message ID: ');
+        let messageData = yield question('Please provide your Data (json obj) if any: ');
+        if (typeof messageData === 'string' && messageData.trim() === '') {
+            messageData = {};
+        }
+        else {
+            messageData = JSON.parse(messageData.toString());
+        }
+        let response = yield server.engine.throwMessage(messageId, messageData);
+        if (response['id'])
+            return yield displayInstance(response['id']);
+        else {
+            console.log(' no results.');
+            return null;
+        }
+    });
+}
 function delInstances() {
     return __awaiter(this, void 0, void 0, function* () {
-        const name = yield question('Please provide process name to delete instnaces: ');
+        const name = yield question('Please provide process name to delete instances for process: ');
         let response = yield server.datastore.deleteInstances({ name: name });
         console.log("Instances Deleted:", response['result']['deletedCount']);
     });

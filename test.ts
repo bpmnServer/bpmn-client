@@ -5,8 +5,40 @@ console.log("Testing BPMNClient");
 const dotenv = require('dotenv');
 const res = dotenv.config();
 
-console.log(res);
-test();
+const server = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+
+testMessage();
+
+async function displayInstance(instanceId) {
+
+    let insts = await server.datastore.findInstances({ id: instanceId })
+
+    for (var i = 0; i < insts.length; i++) {
+        let inst = insts[i];
+        var items = inst.items;
+        console.log(`name: ${inst.name} status: ${inst.status}	instanceId:	${inst.id}
+	startedAt: ${inst.startedAt} endedAt ${inst.endedAt}`, 'data:', inst.data);
+        for (var j = 0; j < items.length; j++) {
+            let item = items[j];
+            console.log(`element: ${item.elementId} status: ${item.status}	id:	${item.id}`);
+        }
+    }
+}
+
+
+async function testMessage() {
+    const messageId = 'Message-104';
+
+    let messageData = {};
+
+    console.log('calling');
+    let response = await server.engine.throwMessage(messageId, messageData);
+    if (response['id'])
+        return await displayInstance(response['id']);
+    else
+        return null;
+}
+
 
 async function test() {
 

@@ -36,8 +36,14 @@ class WebService {
                             data += chunk;
                         });
                         res.on('end', () => {
-                            self.result = JSON.parse(data);
-                            resolve(self.result);
+                            try {
+                                self.result = JSON.parse(data);
+                                resolve(self.result);
+                            }
+                            catch (exc) {
+                                console.log(data);
+                                console.log(exc);
+                            }
                         });
                     }).on("error", (err) => {
                         console.log("Error: " + err.message);
@@ -141,9 +147,9 @@ class ClientEngine {
             return instance;
         });
     }
-    throwMessage(messageId, data) {
+    throwMessage(messageId, data = {}, messageMatchingKey = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ret = yield this.client.put('engine/throwMessage', { "messageId": messageId, "data": data });
+            const ret = yield this.client.post('engine/throwMessage', { "messageId": messageId, "data": data, messageMatchingKey });
             if (ret['errors']) {
                 console.log(ret['errors']);
                 throw new Error(ret['errors']);
@@ -151,9 +157,9 @@ class ClientEngine {
             return ret;
         });
     }
-    throwSignal(signalId, data) {
+    throwSignal(signalId, data = {}, messageMatchingKey = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ret = yield this.client.put('engine/throwSignal', { "signalId": signalId, "data": data });
+            const ret = yield this.client.post('engine/throwSignal', { "signalId": signalId, "data": data, messageMatchingKey });
             if (ret['errors']) {
                 console.log(ret['errors']);
                 throw new Error(ret['errors']);

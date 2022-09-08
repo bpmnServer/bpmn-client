@@ -13,8 +13,35 @@ const _1 = require("./");
 console.log("Testing BPMNClient");
 const dotenv = require('dotenv');
 const res = dotenv.config();
-console.log(res);
-test();
+const server = new _1.BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+testMessage();
+function displayInstance(instanceId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let insts = yield server.datastore.findInstances({ id: instanceId });
+        for (var i = 0; i < insts.length; i++) {
+            let inst = insts[i];
+            var items = inst.items;
+            console.log(`name: ${inst.name} status: ${inst.status}	instanceId:	${inst.id}
+	startedAt: ${inst.startedAt} endedAt ${inst.endedAt}`, 'data:', inst.data);
+            for (var j = 0; j < items.length; j++) {
+                let item = items[j];
+                console.log(`element: ${item.elementId} status: ${item.status}	id:	${item.id}`);
+            }
+        }
+    });
+}
+function testMessage() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const messageId = 'Message-104';
+        let messageData = {};
+        console.log('calling');
+        let response = yield server.engine.throwMessage(messageId, messageData);
+        if (response['id'])
+            return yield displayInstance(response['id']);
+        else
+            return null;
+    });
+}
 function test() {
     return __awaiter(this, void 0, void 0, function* () {
         const server = new _1.BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
