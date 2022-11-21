@@ -13,8 +13,31 @@ const _1 = require("./");
 console.log("Testing BPMNClient");
 const dotenv = require('dotenv');
 const res = dotenv.config();
+const fs = require('fs');
 const server = new _1.BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
-testMessage();
+//testMessage();
+testImport();
+function testImport() {
+    return __awaiter(this, void 0, void 0, function* () {
+        var file = 'test-import';
+        var path = '../webApp/processes/Trans.bpmn';
+        var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data;filename=\"" + path + "\"\r\nContent-Type: \"text/plain\"\r\n\r\n" + fs.readFileSync(file) + "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
+        console.log(postData);
+        //        var res = await upload('definitions/import/' + name, postData);
+        if (res['errors']) {
+            console.log(res['errors']);
+            throw new Error(res['errors']);
+        }
+    });
+}
+function testImport2() {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log('calling');
+        var file = '../webApp/processes/Trans.bpmn';
+        let response = yield server.definitions.import('testing_123', file);
+        console.log(response);
+    });
+}
 function displayInstance(instanceId) {
     return __awaiter(this, void 0, void 0, function* () {
         let insts = yield server.datastore.findInstances({ id: instanceId });

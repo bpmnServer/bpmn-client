@@ -4,10 +4,38 @@ import { BPMNClient } from './';
 console.log("Testing BPMNClient");
 const dotenv = require('dotenv');
 const res = dotenv.config();
+const fs = require('fs');
 
 const server = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
-testMessage();
+//testMessage();
+testImport();
+
+async function testImport() {
+
+
+    var file = 'test-import';
+    var path = '../webApp/processes/Trans.bpmn';
+
+        var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data;filename=\"" + path + "\"\r\nContent-Type: \"text/plain\"\r\n\r\n" + fs.readFileSync(file) + "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
+
+        console.log(postData);
+//        var res = await upload('definitions/import/' + name, postData);
+
+    if(res['errors']) {
+        console.log(res['errors']);
+        throw new Error(res['errors']);
+    }
+
+}
+async function testImport2() {
+
+
+    console.log('calling');
+    var file = '../webApp/processes/Trans.bpmn';
+    let response = await server.definitions.import('testing_123', file);
+    console.log(response);
+}
 
 async function displayInstance(instanceId) {
 

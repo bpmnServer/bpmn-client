@@ -13,9 +13,10 @@ exports.ClientDefinitions = exports.ClientDatastore = exports.ClientEngine = exp
 console.log("BPMNClient 1.2");
 const https = require('https');
 const http = require('http');
+const fs = require("fs");
 class WebService {
     constructor() { }
-    invoke(params, options) {
+    invoke(params, options, postData = null) {
         return __awaiter(this, void 0, void 0, function* () {
             var driver = http;
             var body = JSON.stringify(params);
@@ -26,7 +27,7 @@ class WebService {
             let self = this;
             return new Promise(function (resolve, reject) {
                 try {
-                    driver.request(options, function (res) {
+                    var req = driver.request(options, function (res) {
                         //                    console.log('STATUS: ' + res.statusCode);
                         this.response = res;
                         //console.log(res);
@@ -45,10 +46,14 @@ class WebService {
                                 console.log(exc);
                             }
                         });
-                    }).on("error", (err) => {
+                    });
+                    req.on("error", (err) => {
                         console.log("Error: " + err.message);
                         reject(err);
-                    }).end(body);
+                    });
+                    if (postData !== null)
+                        req.write(postData);
+                    req.end(body);
                 }
                 catch (exc) {
                     console.log(exc);
@@ -87,9 +92,59 @@ class BPMNClient extends WebService {
             return yield this.request(url, 'DELETE', data);
         });
     }
+    upload(url, fileName, path) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('upload');
+            var options = {
+                'method': 'POST',
+                'hostname': this.host,
+                'port': this.port,
+                'path': url + '/' + fileName,
+                'headers': {
+                    'x-api-key': this.apiKey
+                },
+                'maxRedirects': 20
+            };
+            var req = http.request(options, function (res) {
+                var chunks = [];
+                res.on("data", function (chunk) {
+                    chunks.push(chunk);
+                });
+                res.on("end", function (chunk) {
+                    var body = Buffer.concat(chunks);
+                    console.log(body.toString());
+                });
+                res.on("error", function (error) {
+                    console.error(error);
+                });
+            });
+            var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"file\"; filename=\""
+                + fileName + "\"\r\nContent-Type: \"text/plain\"\r\n\r\n" +
+                fs.readFileSync(path) + "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
+            req.setHeader('content-type', 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW');
+            req.write(postData);
+            req.end();
+        });
+    }
     request(url, method, params) {
         return __awaiter(this, void 0, void 0, function* () {
             var body = JSON.stringify(params);
+            var size = Buffer.byteLength(body);
+            var contentType = "application/json";
+            if (method == 'UPLOAD') {
+                contentType = 'multipart/form-data; boundary = ----WebKitFormBoundary7MA4YWxkTrZu0gW';
+                method = 'POST';
+            }
+            var headers = {
+                "Content-Type": contentType,
+                "x-api-key": this.apiKey,
+                "Accept": "*/*",
+                //                        "User-Agent": "PostmanRuntime/ 7.26.8",
+                //                        "Accept-Encoding": "gzip, deflate, br",
+                "Connection": "keep-alive"
+                //,
+                // "Content-Length": Buffer.byteLength(body)
+            };
             var options;
             if (params) {
                 options = {
@@ -97,15 +152,7 @@ class BPMNClient extends WebService {
                     port: this.port,
                     path: '/api/' + url,
                     method: method,
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-api-key": this.apiKey,
-                        "Accept": "*/*",
-                        //                        "User-Agent": "PostmanRuntime/ 7.26.8",
-                        //                        "Accept-Encoding": "gzip, deflate, br",
-                        "Connection": "keep-alive",
-                        "Content-Length": Buffer.byteLength(body)
-                    }
+                    headers: headers
                 };
             }
             else {
@@ -227,6 +274,12 @@ class ClientDefinitions {
     constructor(client) {
         this.client = client;
     }
+    import(name, path) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var res = yield this.client.upload('definitions/import', name, path);
+            return res;
+        });
+    }
     list() {
         return __awaiter(this, void 0, void 0, function* () {
             var res = yield this.client.get('definitions/list', []);
@@ -237,9 +290,31 @@ class ClientDefinitions {
             return res;
         });
     }
+    delete(name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield this.client.post('definitions/delete/', { name });
+            if (res['errors']) {
+                console.log(res['errors']);
+                throw new Error(res['errors']);
+            }
+            console.log(res);
+            return res;
+        });
+    }
+    rename(name, newName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield this.client.post('definitions/rename/', { name, newName });
+            if (res['errors']) {
+                console.log(res['errors']);
+                throw new Error(res['errors']);
+            }
+            console.log(res);
+            return res;
+        });
+    }
     load(name) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield this.client.get(encodeURI('definitions/load/' + name), { name: name });
+            const res = yield this.client.get(encodeURI('definitions/load/' + name), { name });
             if (res['errors']) {
                 console.log(res['errors']);
                 throw new Error(res['errors']);

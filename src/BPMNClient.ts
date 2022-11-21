@@ -4,15 +4,18 @@ console.log("BPMNClient 1.2");
 
 const https = require('https');
 const http = require('http');
+const fs = require("fs");
 
 class WebService {
     statusCode;
     result;
     response;
     constructor() { }
-    async invoke(params, options) {
+
+    async invoke(params, options,postData=null) {
 
         var driver = http;
+
         var body = JSON.stringify(params);
 
 //        console.log(options, params);
@@ -24,8 +27,8 @@ class WebService {
         return new Promise(function (resolve, reject) {
             try {
 
-                driver.request(options, function (res) {
-//                    console.log('STATUS: ' + res.statusCode);
+                var req = driver.request(options, function (res) {
+                    //                    console.log('STATUS: ' + res.statusCode);
                     this.response = res;
                     //console.log(res);
                     self.statusCode = res.statusCode;
@@ -45,10 +48,15 @@ class WebService {
                     });
 
 
-                }).on("error", (err) => {
+                });
+                req.on("error", (err) => {
                     console.log("Error: " + err.message);
                     reject(err);
-                }).end(body);
+                });
+                if (postData !==null)
+                    req.write(postData);
+
+                req.end(body);
             }
             catch (exc) {
                 console.log(exc);
@@ -92,9 +100,70 @@ class BPMNClient extends WebService {
         return await this.request(url, 'DELETE', data);
 
     }
+
+    async upload(url, fileName, path) {
+        console.log('upload');
+        var options = {
+            'method': 'POST',
+            'hostname': this.host,
+            'port': this.port,
+            'path': url + '/' + fileName,
+            'headers': {
+                'x-api-key': this.apiKey
+            },
+            'maxRedirects': 20
+        };
+        var req = http.request(options, function (res) {
+            var chunks = [];
+
+            res.on("data", function (chunk) {
+                chunks.push(chunk);
+            });
+
+            res.on("end", function (chunk) {
+                var body = Buffer.concat(chunks);
+                console.log(body.toString());
+            });
+
+            res.on("error", function (error) {
+                console.error(error);
+            });
+        });
+
+        var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"file\"; filename=\""
+            + fileName + "\"\r\nContent-Type: \"text/plain\"\r\n\r\n" +
+            fs.readFileSync(path) + "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
+
+        req.setHeader('content-type', 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW');
+
+        req.write(postData);
+
+        req.end();
+    }
+
+
     async request(url, method, params) {
 
         var body = JSON.stringify(params);
+        var size = Buffer.byteLength(body);
+        var contentType = "application/json";
+
+        if (method == 'UPLOAD') {
+            contentType = 'multipart/form-data; boundary = ----WebKitFormBoundary7MA4YWxkTrZu0gW';
+            method = 'POST';
+        }
+
+        var headers = {
+            "Content-Type": contentType ,
+            "x-api-key": this.apiKey,
+            "Accept": "*/*",
+            //                        "User-Agent": "PostmanRuntime/ 7.26.8",
+            //                        "Accept-Encoding": "gzip, deflate, br",
+            "Connection": "keep-alive"
+            //,
+            // "Content-Length": Buffer.byteLength(body)
+        };
+
 
         var options;
 
@@ -104,15 +173,7 @@ class BPMNClient extends WebService {
                 port: this.port,
                 path: '/api/' + url,
                 method: method,
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-api-key": this.apiKey,
-                    "Accept": "*/*",
-                    //                        "User-Agent": "PostmanRuntime/ 7.26.8",
-                    //                        "Accept-Encoding": "gzip, deflate, br",
-                    "Connection": "keep-alive",
-                    "Content-Length": Buffer.byteLength(body)
-                }
+                headers: headers
             };
         }
         else {
@@ -210,6 +271,7 @@ class ClientDatastore {
     }
     async findInstances(query): Promise<IInstanceData[]> {
         const res = await this.client.get('datastore/findInstances', query);
+
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -227,6 +289,15 @@ class ClientDefinitions {
     constructor(client) {
         this.client = client;
     }
+
+    
+    async import(name, path) {
+
+        var res = await this.client.upload('definitions/import',name,path);
+
+        return res;
+
+    }
     async list(): Promise<string[]> {
         var res = await this.client.get('definitions/list', []);
         if (res['errors']) {
@@ -236,8 +307,28 @@ class ClientDefinitions {
         return res as string[];
 
     }
+    async delete(name) {
+        const res = await this.client.post('definitions/delete/', { name });
+        if (res['errors']) {
+            console.log(res['errors']);
+            throw new Error(res['errors']);
+        }
+        console.log(res);
+        return res as IDefinitionData;
+
+    }
+    async rename(name,newName) {
+        const res = await this.client.post('definitions/rename/', { name , newName });
+        if (res['errors']) {
+            console.log(res['errors']);
+            throw new Error(res['errors']);
+        }
+        console.log(res);
+        return res as IDefinitionData;
+
+    }
     async load(name): Promise<IDefinitionData> {
-        const res = await this.client.get(encodeURI('definitions/load/' + name), { name: name });
+        const res = await this.client.get(encodeURI('definitions/load/' + name), { name });
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
