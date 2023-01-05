@@ -107,7 +107,7 @@ class BPMNClient extends WebService {
             'method': 'POST',
             'hostname': this.host,
             'port': this.port,
-            'path': url + '/' + fileName,
+            'path': '/api/'+ url + '/' + fileName,
             'headers': {
                 'x-api-key': this.apiKey
             },
@@ -139,6 +139,8 @@ class BPMNClient extends WebService {
         req.write(postData);
 
         req.end();
+
+        return req;
     }
 
 

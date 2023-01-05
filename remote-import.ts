@@ -4,18 +4,24 @@
 import { BPMNClient } from './';
 
 
+console.log('remote-import.ts');
 
 fromClientLib();
+
+console.log('-------------------');
 //FromPostMan();
 
 async function fromClientLib() {
-    const server = new BPMNClient('localhost', 3000, '1234');
+
+    console.log('from client lib');
+    const server = new BPMNClient('localhost', 3000, '12345');
 
     var name = 'test-import';
     var file = 'E:\\x4\\dev\\webApp\\processes\\Trans.bpmn';
 
-    server.definitions.import(name, file);
-
+    var res=await server.definitions.import(name, file);
+    //console.log(res.length);
+    return res;
 }
 async function FromPostMan() {
 
@@ -24,13 +30,15 @@ async function FromPostMan() {
 
 
     var http = require('follow-redirects').http;
+    //const http = require('http');
+
     var fs = require('fs');
 
     var options = {
         'method': 'POST',
         'hostname': 'localhost',
         'port': 3000,
-        'path': '/api/definitions/import/testing3',
+        'path': '/api/definitions/import/testing4',
         'headers': {
             'x-api-key': '12345',
             'Cookie': 'connect.sid=s%3AXMa01DuOlQ4WsrvBj0FVaIrTak49vLPB.hDIV9j7ONA437rZf%2F%2Biu%2Bc6B7T5%2FVuEIjj1BAaoCJW4'
@@ -62,6 +70,8 @@ async function FromPostMan() {
     req.write(postData);
 
     req.end();
+
+    return req;
 
 }
 
@@ -112,5 +122,5 @@ async function request(name,path) {
     req.write(postData);
 
     req.end();
-
+    console.log('end');
 }

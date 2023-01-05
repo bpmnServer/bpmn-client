@@ -99,7 +99,7 @@ class BPMNClient extends WebService {
                 'method': 'POST',
                 'hostname': this.host,
                 'port': this.port,
-                'path': url + '/' + fileName,
+                'path': '/api/' + url + '/' + fileName,
                 'headers': {
                     'x-api-key': this.apiKey
                 },
@@ -124,6 +124,7 @@ class BPMNClient extends WebService {
             req.setHeader('content-type', 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW');
             req.write(postData);
             req.end();
+            return req;
         });
     }
     request(url, method, params) {
