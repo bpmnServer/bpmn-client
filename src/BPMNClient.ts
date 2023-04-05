@@ -12,13 +12,37 @@ class WebService {
     response;
     constructor() { }
 
-    async invoke(params, options,postData=null) {
+    async invoke(params, options, postData = null) {
+
+        var axios = require('axios');
+
+        var data = JSON.stringify(params);
+        var url = 'http://'+options.host+':'+options.port+options.path;
+
+        if (options.port == 443)
+            url = 'https://'+options.host+options.path;
+
+        var config = {
+            method: options.method,
+            url: url,
+            headers: options.headers,
+            data: data
+        };
+
+        let self = this;
+
+        let response = await axios(config);
+        self.result = response.data;
+
+        return response.data;
+    }
+    async invokeOld(params, options,postData=null) {
 
         var driver = http;
 
         var body = JSON.stringify(params);
-
-//        console.log(options, params);
+        console.log('invoke:');
+        console.log('options:',options, params);
         if (options.port == 443)
             driver = https;
 
@@ -28,16 +52,22 @@ class WebService {
             try {
 
                 var req = driver.request(options, function (res) {
-                    //                    console.log('STATUS: ' + res.statusCode);
+                     console.log('STATUS: ' + res.statusCode);
                     this.response = res;
                     //console.log(res);
                     self.statusCode = res.statusCode;
                     res.setEncoding('utf8');
                     res.on('data', function (chunk) {
+                        console.log('>>chunk', chunk);
                         data += chunk;
                     });
                     res.on('end', () => {
+                        console.log('response end');
                         try {
+                            if (data == null)
+                                console.log("empty response");
+                            console.log('data:', data);
+                            
                             self.result = JSON.parse(data);
                             resolve(self.result);
                         }
@@ -53,10 +83,13 @@ class WebService {
                     console.log("Error: " + err.message);
                     reject(err);
                 });
-                if (postData !==null)
+                if (postData !== null)
                     req.write(postData);
-
+                else
+                    req.write('');
+                console.log('request ending',body);
                 req.end(body);
+                console.log('request ended');
             }
             catch (exc) {
                 console.log(exc);
@@ -76,6 +109,7 @@ class BPMNClient extends WebService {
 
     constructor(host, port, apiKey) {
         super();
+;
         this.host = host;
         this.port = port;
         this.apiKey = apiKey;
@@ -186,7 +220,6 @@ class BPMNClient extends WebService {
                 method: method
             };
         }
-
 
         return await this.invoke(params, options);
 

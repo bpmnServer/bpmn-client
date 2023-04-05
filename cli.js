@@ -14,6 +14,7 @@ const _1 = require("./");
 const readline = require("readline");
 const dotenv = require('dotenv');
 const res = dotenv.config();
+console.log(res);
 const server = new _1.BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 const cl = readline.createInterface(process.stdin, process.stdout);
 const question = function (q) {

@@ -1,16 +1,85 @@
 import { BPMNClient } from './';
 
+import * as readline from 'readline';
+const cl = readline.createInterface(process.stdin, process.stdout);
+const question = function (q) {
+    return new Promise((res, rej) => {
+        cl.question(q, answer => {
+            res(answer);
+        })
+    });
+};
+
 
 console.log("Testing BPMNClient");
 const dotenv = require('dotenv');
 const res = dotenv.config();
+console.log(res.parsed.PORT);
 const fs = require('fs');
+//raw();
 
-const server = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
+const server = new BPMNClient(process.env.HOST, res.parsed.PORT, process.env.API_KEY);
+console.log(server);
 //testMessage();
-testImport();
+// testImport();
+test1();
+end(); 
 
+async function raw() {
+    var https = require('follow-redirects').https;
+    var fs = require('fs');
+
+    var options = {
+        'method': 'GET',
+        'hostname': 'localhost',
+        'port': 3000,
+        'path': '/api/datastore/findItems',
+        'headers': {
+            'x-api-key': '12345',
+            'Content-Type': 'application/json',
+            'Cookie': 'connect.sid=s%3AFJpzbs-nlVsxrhROzC_e0joMyopi6ke0.uoCjT87OZa3SOJosZxXCrC7zriAIVdMmtwcKsrY2C4I'
+        },
+        'maxRedirects': 20
+    };
+
+    var req = https.request(options, function (res) {
+        var chunks = [];
+
+        res.on("data", function (chunk) {
+            chunks.push(chunk);
+        });
+
+        res.on("end", function (chunk) {
+            var body = Buffer.concat(chunks);
+            console.log(body.toString());
+        });
+
+        res.on("error", function (error) {
+            console.error(error);
+        });
+    });
+
+    var postData = JSON.stringify({ "items.status": "end", "items.elementId": "script_task" });
+
+    req.write(postData);
+
+    req.end();
+}
+
+async function end() {
+    await question("continue")
+}
+async function test1() {
+    var items = await server.definitions.list();
+
+
+    items.forEach(item => {
+//        console.log('item: id==>' + item.elementId, item.type, item.name, 'status==>', item.status);
+    });
+
+
+}
 async function testImport() {
 
 
@@ -70,7 +139,7 @@ async function testMessage() {
 
 async function test() {
 
-    const server = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+    const server = new BPMNClient(process.env.HOST, res.parsed.PORT, process.env.API_KEY);
 
     const caseId = 3040;
 
