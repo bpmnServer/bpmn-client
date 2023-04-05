@@ -5,7 +5,7 @@ import * as readline from 'readline';
 
 const dotenv = require('dotenv');
 const res = dotenv.config();
-console.log(res);
+
 const server = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
 const cl = readline.createInterface( process.stdin, process.stdout );
