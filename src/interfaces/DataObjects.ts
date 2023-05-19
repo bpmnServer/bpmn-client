@@ -1,4 +1,4 @@
-import { ITEM_STATUS, } from './Enums';
+import { ITEM_STATUS } from './Enums';
 
 interface IItemData {
     id: string;            // System generated unique Id
@@ -6,6 +6,7 @@ interface IItemData {
     elementId: string;   // bpmn element
     name: string;       // name of bpmn element
     type: string;       // bpmn element type
+    instanceId: string;   // Instance Id of the item
     tokenId: any;         // execution Token
     userId: any;
     startedAt: any;
@@ -94,4 +95,4 @@ interface IProcessData {
     name;
     isExecutable;
 }
-export { IItemData, IInstanceData , IDefinitionData, IElementData, IFlowData , IBpmnModelData, IProcessData, IEventData }
+export { IItemData, IInstanceData, IDefinitionData, IElementData, IFlowData, IBpmnModelData, IProcessData, IEventData };
