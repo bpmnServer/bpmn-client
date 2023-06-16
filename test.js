@@ -10,6 +10,52 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = require("./");
+const fs = require("fs");
+const axios = require('axios');
+const FormData = require('form-data');
+uploadFile('Trans.bpmn');
+//-----------------------------------
+function uploadFile(file) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var axios = require('axios');
+        const fileContents = fs.createReadStream(file);
+        const title = 'My file';
+        const form = new FormData();
+        form.append('title', 'title');
+        form.append('file', fileContents);
+        console.log(1);
+        var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"file\"; filename=\""
+            + file + "\"\r\nContent-Type: \"text/plain\"\r\n\r\n" +
+            fs.readFileSync(file) + "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
+        //    formData.append(postData);
+        try {
+            console.log(2, form);
+            const response = yield axios.post('http://localhost:3000/api/definitions/import/test1', form, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "x-api-key": "12345",
+                }
+            });
+            console.log(3);
+            console.log('Response Status:', response.status, response.data);
+        }
+        catch (error) {
+            console.log('ERROR------------');
+            if (error.response) { // get response with a status code not in range 2xx
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            }
+            else if (error.request) { // no response
+                console.log(error.request);
+            }
+            else { // Something wrong in setting up the request
+                console.log('Error', error.message);
+            }
+            console.log(error.config);
+        }
+    });
+}
 const readline = require("readline");
 const cl = readline.createInterface(process.stdin, process.stdout);
 const question = function (q) {
@@ -19,18 +65,39 @@ const question = function (q) {
         });
     });
 };
+//fun1();
+function fun1() {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield fun2();
+    });
+}
+function fun2() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield fun3();
+        }
+        catch (exc) {
+            console.log('error caught but not handled');
+        }
+    });
+}
+function fun3() {
+    return __awaiter(this, void 0, void 0, function* () {
+        throw new Error('fun3');
+    });
+}
 console.log("Testing BPMNClient");
 const dotenv = require('dotenv');
 const res = dotenv.config();
 console.log(res.parsed.PORT);
-const fs = require('fs');
 //raw();
 const server = new _1.BPMNClient(process.env.HOST, res.parsed.PORT, process.env.API_KEY);
-console.log(server);
 //testMessage();
 // testImport();
+/*
 test1();
 end();
+*/
 function raw() {
     return __awaiter(this, void 0, void 0, function* () {
         var https = require('follow-redirects').https;

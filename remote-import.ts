@@ -6,22 +6,56 @@ import { BPMNClient } from './';
 
 console.log('remote-import.ts');
 
+//badImport();
 fromClientLib();
 
 console.log('-------------------');
 //FromPostMan();
+/*
+process.on('uncaughtException', function (err) {
+console.log('*******************Client ERROR***********');
+  console.error(err.stack);
+  throw err;
+}); 
+*/
+async function badImport() 
+{
+    const path = require('path');
 
+        try{
+            const bpmnServer = new BPMNClient(
+                '127.0.0.1',
+                3000,
+               12345,
+            );
+
+            const importResult = await bpmnServer.definitions.import(
+                'dummyTest',
+                path.resolve('test.js'),
+            );
+            console.log('badImport done');
+            return 'done';
+        } catch(err){
+            console.log('badImport Error',err);
+        }
+}
 async function fromClientLib() {
 
     console.log('from client lib');
+	try {
     const server = new BPMNClient('localhost', 3000, '12345');
 
     var name = 'test-import';
-    var file = 'E:\\x4\\dev\\webApp\\processes\\Trans.bpmn';
+    var file = '..\\WebApp\\processes\\Trans.bpmn';
 
     var res=await server.definitions.import(name, file);
-    //console.log(res.length);
     return res;
+	}
+	catch(exc)
+	{
+		console.log('*******ERROR********');
+		console.log(exc);
+	}
 }
 async function FromPostMan() {
 

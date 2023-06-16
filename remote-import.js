@@ -13,18 +13,45 @@ Object.defineProperty(exports, "__esModule", { value: true });
 //request('test4', 'Trans.bpmn');
 const _1 = require("./");
 console.log('remote-import.ts');
+//badImport();
 fromClientLib();
 console.log('-------------------');
 //FromPostMan();
+/*
+process.on('uncaughtException', function (err) {
+console.log('*******************Client ERROR***********');
+  console.error(err.stack);
+  throw err;
+});
+*/
+function badImport() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const path = require('path');
+        try {
+            const bpmnServer = new _1.BPMNClient('127.0.0.1', 3000, 12345);
+            const importResult = yield bpmnServer.definitions.import('dummyTest', path.resolve('test.js'));
+            console.log('badImport done');
+            return 'done';
+        }
+        catch (err) {
+            console.log('badImport Error', err);
+        }
+    });
+}
 function fromClientLib() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('from client lib');
-        const server = new _1.BPMNClient('localhost', 3000, '12345');
-        var name = 'test-import';
-        var file = 'E:\\x4\\dev\\webApp\\processes\\Trans.bpmn';
-        var res = yield server.definitions.import(name, file);
-        //console.log(res.length);
-        return res;
+        try {
+            const server = new _1.BPMNClient('localhost', 3000, '12345');
+            var name = 'test-import';
+            var file = '..\\WebApp\\processes\\Trans.bpmn';
+            var res = yield server.definitions.import(name, file);
+            return res;
+        }
+        catch (exc) {
+            console.log('*******ERROR********');
+            console.log(exc);
+        }
     });
 }
 function FromPostMan() {

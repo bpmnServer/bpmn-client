@@ -10,91 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientDefinitions = exports.ClientDatastore = exports.ClientEngine = exports.BPMNClient = void 0;
+const WebService_1 = require("./WebService");
 console.log("BPMNClient 1.2");
-const https = require('https');
-const http = require('http');
-const fs = require("fs");
-class WebService {
-    constructor() { }
-    invoke(params, options, postData = null) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var axios = require('axios');
-            var data = JSON.stringify(params);
-            var url = 'http://' + options.host + ':' + options.port + options.path;
-            if (options.port == 443)
-                url = 'https://' + options.host + options.path;
-            var config = {
-                method: options.method,
-                url: url,
-                headers: options.headers,
-                data: data
-            };
-            let self = this;
-            let response = yield axios(config);
-            self.result = response.data;
-            return response.data;
-        });
-    }
-    invokeOld(params, options, postData = null) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var driver = http;
-            var body = JSON.stringify(params);
-            console.log('invoke:');
-            console.log('options:', options, params);
-            if (options.port == 443)
-                driver = https;
-            let data = '';
-            let self = this;
-            return new Promise(function (resolve, reject) {
-                try {
-                    var req = driver.request(options, function (res) {
-                        console.log('STATUS: ' + res.statusCode);
-                        this.response = res;
-                        //console.log(res);
-                        self.statusCode = res.statusCode;
-                        res.setEncoding('utf8');
-                        res.on('data', function (chunk) {
-                            console.log('>>chunk', chunk);
-                            data += chunk;
-                        });
-                        res.on('end', () => {
-                            console.log('response end');
-                            try {
-                                if (data == null)
-                                    console.log("empty response");
-                                console.log('data:', data);
-                                self.result = JSON.parse(data);
-                                resolve(self.result);
-                            }
-                            catch (exc) {
-                                console.log(data);
-                                console.log(exc);
-                            }
-                        });
-                    });
-                    req.on("error", (err) => {
-                        console.log("Error: " + err.message);
-                        reject(err);
-                    });
-                    if (postData !== null)
-                        req.write(postData);
-                    else
-                        req.write('');
-                    console.log('request ending', body);
-                    req.end(body);
-                    console.log('request ended');
-                }
-                catch (exc) {
-                    console.log(exc);
-                }
-            });
-        });
-    }
-}
-class BPMNClient extends WebService {
+class BPMNClient extends WebService_1.WebService {
     constructor(host, port, apiKey) {
         super();
-        ;
         this.host = host;
         this.port = port;
         this.apiKey = apiKey;
@@ -120,41 +40,6 @@ class BPMNClient extends WebService {
     del(url, data = {}) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.request(url, 'DELETE', data);
-        });
-    }
-    upload(url, fileName, path) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log('upload');
-            var options = {
-                'method': 'POST',
-                'hostname': this.host,
-                'port': this.port,
-                'path': '/api/' + url + '/' + fileName,
-                'headers': {
-                    'x-api-key': this.apiKey
-                },
-                'maxRedirects': 20
-            };
-            var req = http.request(options, function (res) {
-                var chunks = [];
-                res.on("data", function (chunk) {
-                    chunks.push(chunk);
-                });
-                res.on("end", function (chunk) {
-                    var body = Buffer.concat(chunks);
-                    console.log(body.toString());
-                });
-                res.on("error", function (error) {
-                    console.error(error);
-                });
-            });
-            var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"file\"; filename=\""
-                + fileName + "\"\r\nContent-Type: \"text/plain\"\r\n\r\n" +
-                fs.readFileSync(path) + "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
-            req.setHeader('content-type', 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW');
-            req.write(postData);
-            req.end();
-            return req;
         });
     }
     request(url, method, params) {
@@ -307,7 +192,20 @@ class ClientDefinitions {
     }
     import(name, path) {
         return __awaiter(this, void 0, void 0, function* () {
-            var res = yield this.client.upload('definitions/import', name, path);
+            var options = {
+                'method': 'POST',
+                'hostname': this.client.host,
+                'port': this.client.port,
+                'path': '/api/definitions/import/' + name,
+                'headers': {
+                    'x-api-key': this.client.apiKey
+                },
+                'maxRedirects': 20
+            };
+            console.log('import ', name, path);
+            var res = yield this.client.upload(name, path, options);
+            console.log('import done ', res);
+            this.checkErrors(res);
             return res;
         });
     }
@@ -353,6 +251,12 @@ class ClientDefinitions {
             console.log(res);
             return res;
         });
+    }
+    checkErrors(res) {
+        if (res['errors']) {
+            console.log(res['errors']);
+            throw new Error(res['errors']);
+        }
     }
 }
 exports.ClientDefinitions = ClientDefinitions;

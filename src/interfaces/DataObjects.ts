@@ -1,4 +1,4 @@
-import { ITEM_STATUS } from './Enums';
+import { ITEM_STATUS, } from './Enums';
 
 interface IItemData {
     id: string;            // System generated unique Id
@@ -20,6 +20,7 @@ interface IItemData {
     assignments;
     authorizations;
     notifications;
+    vars;
 }
 interface IInstanceData {
     id;
@@ -95,4 +96,4 @@ interface IProcessData {
     name;
     isExecutable;
 }
-export { IItemData, IInstanceData, IDefinitionData, IElementData, IFlowData, IBpmnModelData, IProcessData, IEventData };
+export { IItemData, IInstanceData , IDefinitionData, IElementData, IFlowData , IBpmnModelData, IProcessData, IEventData }

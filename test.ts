@@ -1,4 +1,75 @@
 import { BPMNClient } from './';
+const fs = require("fs");
+
+const axios = require('axios');
+const FormData = require('form-data');
+
+
+uploadFile('Trans.bpmn');
+
+//-----------------------------------
+async function uploadFile(file) {
+
+   var axios = require('axios');
+
+    const fileContents = fs.createReadStream(file);
+    const title = 'My file';
+  
+    const form = new FormData();
+    form.append('title', 'title');
+    form.append('file', fileContents);
+console.log(1);
+        var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"file\"; filename=\""
+            + file + "\"\r\nContent-Type: \"text/plain\"\r\n\r\n" +
+            fs.readFileSync(file) + "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
+//    formData.append(postData);
+
+
+
+  try {
+console.log(2,form);
+
+    const response = await axios.post('http://localhost:3000/api/definitions/import/test1', form, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "x-api-key": "12345",
+
+      }
+    });
+console.log(3);
+
+    console.log('Response Status:',response.status,response.data);
+  } catch (error) {
+    console.log('ERROR------------');
+    if (error.response) { // get response with a status code not in range 2xx
+      console.log(error.response.data);
+      console.log(error.response.status);
+      console.log(error.response.headers);
+    } else if (error.request) { // no response
+      console.log(error.request);
+    } else { // Something wrong in setting up the request
+      console.log('Error', error.message);
+    }
+    console.log(error.config);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 import * as readline from 'readline';
 const cl = readline.createInterface(process.stdin, process.stdout);
@@ -10,22 +81,40 @@ const question = function (q) {
     });
 };
 
+//fun1();
 
+async function fun1()
+{
+    await fun2();
+}
+async function fun2()
+{
+    try {
+    await fun3();
+    }
+    catch(exc)
+    {
+        console.log('error caught but not handled');
+    }
+}
+async function fun3()
+{
+    throw new Error('fun3');
+}
 console.log("Testing BPMNClient");
 const dotenv = require('dotenv');
 const res = dotenv.config();
 console.log(res.parsed.PORT);
-const fs = require('fs');
 //raw();
 
 
 const server = new BPMNClient(process.env.HOST, res.parsed.PORT, process.env.API_KEY);
-console.log(server);
 //testMessage();
 // testImport();
+/*
 test1();
 end(); 
-
+*/
 async function raw() {
     var https = require('follow-redirects').https;
     var fs = require('fs');
