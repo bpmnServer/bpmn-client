@@ -7,6 +7,7 @@ interface IItemData {
     name: string;       // name of bpmn element
     type: string;       // bpmn element type
     instanceId: string;   // Instance Id of the item
+    vars: any;            // Variables associated with the item
     tokenId: any;         // execution Token
     userId: any;
     startedAt: any;
