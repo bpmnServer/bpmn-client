@@ -40,16 +40,20 @@ class WebService {
             }
         });
     }
-    upload(fileName, path, options) {
+    upload(fileName, path, path2, options) {
         return __awaiter(this, void 0, void 0, function* () {
-            const fileContents = fs.createReadStream(path);
             const title = fileName;
             var url = 'http://' + options.hostname + ':' + options.port + options.path;
             if (options.port == 443)
                 url = 'https://' + options.host + options.path;
             const form = new FormData();
-            form.append('title', 'title');
+            form.append('title', title);
+            const fileContents = fs.createReadStream(path);
             form.append('file', fileContents);
+            if (path2 !== null) {
+                const fileContents2 = fs.createReadStream(path2);
+                form.append('file', fileContents2);
+            }
             try {
                 const response = yield axios.post(url, form, {
                     headers: options.headers

@@ -47,8 +47,9 @@ async function fromClientLib() {
 
     var name = 'test-import';
     var file = '..\\WebApp\\processes\\Trans.bpmn';
+    var file2 = '..\\WebApp\\processes\\Trans.svg';
 
-    var res=await server.definitions.import(name, file);
+    var res=await server.definitions.import(name, file,file2);
     return res;
 	}
 	catch(exc)

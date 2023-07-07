@@ -45,7 +45,8 @@ function fromClientLib() {
             const server = new _1.BPMNClient('localhost', 3000, '12345');
             var name = 'test-import';
             var file = '..\\WebApp\\processes\\Trans.bpmn';
-            var res = yield server.definitions.import(name, file);
+            var file2 = '..\\WebApp\\processes\\Trans.svg';
+            var res = yield server.definitions.import(name, file, file2);
             return res;
         }
         catch (exc) {

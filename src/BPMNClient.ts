@@ -186,7 +186,7 @@ class ClientDefinitions {
         this.client = client;
     }
     
-    async import(name, path) {
+    async import(name, pathToBPMN,pathToSVG=null) {
 
         var options = {
             'method': 'POST',
@@ -199,8 +199,8 @@ class ClientDefinitions {
             'maxRedirects': 20
         };
 
-        console.log('import ',name,path);
-        var res = await this.client.upload(name,path,options);
+        console.log('import ',name,pathToBPMN,pathToSVG);
+        var res = await this.client.upload(name,pathToBPMN,pathToSVG,options);
         console.log('import done ',res);
         this.checkErrors(res);
         return res;

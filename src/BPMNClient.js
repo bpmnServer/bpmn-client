@@ -190,7 +190,7 @@ class ClientDefinitions {
     constructor(client) {
         this.client = client;
     }
-    import(name, path) {
+    import(name, pathToBPMN, pathToSVG = null) {
         return __awaiter(this, void 0, void 0, function* () {
             var options = {
                 'method': 'POST',
@@ -202,8 +202,8 @@ class ClientDefinitions {
                 },
                 'maxRedirects': 20
             };
-            console.log('import ', name, path);
-            var res = yield this.client.upload(name, path, options);
+            console.log('import ', name, pathToBPMN, pathToSVG);
+            var res = yield this.client.upload(name, pathToBPMN, pathToSVG, options);
             console.log('import done ', res);
             this.checkErrors(res);
             return res;

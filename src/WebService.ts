@@ -40,9 +40,8 @@ class WebService {
 		}
     }
 
-    async upload(fileName, path, options) {
+    async upload(fileName, path,path2, options) {
 
-        const fileContents = fs.createReadStream(path);
         const title = fileName;
 
         var url = 'http://'+options.hostname+':'+options.port+options.path;
@@ -52,8 +51,15 @@ class WebService {
 
   
         const form = new FormData();
-        form.append('title', 'title');
+        form.append('title', title);
+        const fileContents = fs.createReadStream(path);
         form.append('file', fileContents);
+        if (path2!==null)
+            {
+            const fileContents2 = fs.createReadStream(path2);
+            form.append('file', fileContents2);
+            }
+
 
         try {
 
