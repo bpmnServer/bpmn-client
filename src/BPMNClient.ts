@@ -190,7 +190,7 @@ class ClientDefinitions {
 
         var options = {
             'method': 'POST',
-            'hostname': this.client.host,
+            'host': this.client.host,
             'port': this.client.port,
             'path': '/api/definitions/import/' + name,
             'headers': {

@@ -194,7 +194,7 @@ class ClientDefinitions {
         return __awaiter(this, void 0, void 0, function* () {
             var options = {
                 'method': 'POST',
-                'hostname': this.client.host,
+                'host': this.client.host,
                 'port': this.client.port,
                 'path': '/api/definitions/import/' + name,
                 'headers': {

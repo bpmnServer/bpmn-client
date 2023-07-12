@@ -42,7 +42,11 @@ function fromClientLib() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('from client lib');
         try {
-            const server = new _1.BPMNClient('localhost', 3000, '12345');
+            //    const server = new BPMNClient('localhost', 3000, '12345');
+            const dotenv = require('dotenv');
+            dotenv.config();
+            console.log('env:', process.env.HOST, process.env.PORT, process.env.API_KEY);
+            const server = new _1.BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
             var name = 'test-import';
             var file = '..\\WebApp\\processes\\Trans.bpmn';
             var file2 = '..\\WebApp\\processes\\Trans.svg';

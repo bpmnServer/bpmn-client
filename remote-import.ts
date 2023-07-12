@@ -43,7 +43,13 @@ async function fromClientLib() {
 
     console.log('from client lib');
 	try {
-    const server = new BPMNClient('localhost', 3000, '12345');
+//    const server = new BPMNClient('localhost', 3000, '12345');
+
+const dotenv = require('dotenv');
+dotenv.config();
+console.log('env:',process.env.HOST, process.env.PORT, process.env.API_KEY);
+
+const server = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
     var name = 'test-import';
     var file = '..\\WebApp\\processes\\Trans.bpmn';

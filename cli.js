@@ -118,10 +118,10 @@ function start() {
 function findItems(query) {
     return __awaiter(this, void 0, void 0, function* () {
         var items = yield server.datastore.findItems(query);
-        console.log(items);
+        console.log(`processName	item.name	item.elementId	instanceId	item.id`);
         for (var i = 0; i < items.length; i++) {
             let item = items[i];
-            console.log(`${item.name} - ${item.elementId}	instanceId:	${item['instanceId']}`);
+            console.log(`${item['processName']}	${item.name}	${item.elementId}	${item['instanceId']}	${item.id}`);
         }
     });
 }

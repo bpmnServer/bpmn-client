@@ -44,11 +44,10 @@ class WebService {
 
         const title = fileName;
 
-        var url = 'http://'+options.hostname+':'+options.port+options.path;
+        var url = 'http://'+options.host+':'+options.port+options.path;
 
         if (options.port == 443)
             url = 'https://'+options.host+options.path;
-
   
         const form = new FormData();
         form.append('title', title);
@@ -71,7 +70,7 @@ class WebService {
 
         } 
         catch (error) {
-            console.log('upload failed:',error.message);
+            console.log('upload failed:',error);
             throw new Error(error.message);
 /*
             if (error.response) { // get response with a status code not in range 2xx
