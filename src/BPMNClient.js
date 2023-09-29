@@ -88,9 +88,9 @@ class ClientEngine {
     constructor(client) {
         this.client = client;
     }
-    start(name, data = {}, startNodeId = null, options = {}) {
+    start(name, data = {}, startNodeId = null, userId = null, options = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ret = yield this.client.post('engine/start', { name, data, startNodeId, options });
+            const ret = yield this.client.post('engine/start', { name, data, startNodeId, userId, options });
             if (ret['errors']) {
                 console.log(ret['errors']);
                 throw new Error(ret['errors']);
@@ -99,9 +99,20 @@ class ClientEngine {
             return instance;
         });
     }
-    invoke(query, data) {
+    invoke(query, data, userId = null) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ret = yield this.client.put('engine/invoke', { query, data });
+            const ret = yield this.client.put('engine/invoke', { query, data, userId });
+            if (ret['errors']) {
+                console.log(ret['errors']);
+                throw new Error(ret['errors']);
+            }
+            const instance = ret['instance'];
+            return instance;
+        });
+    }
+    assign(query, data, userId = null, assignment) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ret = yield this.client.put('engine/assign', { query, data, userId, assignment });
             if (ret['errors']) {
                 console.log(ret['errors']);
                 throw new Error(ret['errors']);

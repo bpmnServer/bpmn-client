@@ -94,9 +94,9 @@ class ClientEngine {
     constructor(client) {
         this.client = client;
     }
-    async start(name, data = {}, startNodeId = null, options = {}): Promise<IInstanceData> {
+    async start(name, data = {}, startNodeId = null,  userId= null,options = {}): Promise<IInstanceData> {
         const ret = await this.client.post('engine/start',
-            { name, data, startNodeId, options });
+            { name, data, startNodeId, userId, options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
@@ -104,8 +104,17 @@ class ClientEngine {
         const instance = ret as IInstanceData;
         return instance;
     }
-    async invoke(query, data): Promise<IInstanceData> {
-        const ret = await this.client.put('engine/invoke', { query, data });
+    async invoke(query, data, userId= null): Promise<IInstanceData> {
+        const ret = await this.client.put('engine/invoke', { query, data , userId });
+        if (ret['errors']) {
+            console.log(ret['errors']);
+            throw new Error(ret['errors']);
+        }
+        const instance = ret['instance'] as IInstanceData;
+        return instance;
+    }
+    async assign(query, data, userId= null,assignment): Promise<IInstanceData> {
+        const ret = await this.client.put('engine/assign', { query, data , userId,assignment });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);

@@ -11,7 +11,7 @@ const PORT = '3000';
 const BASE_URL = 'api';
 
 
-console.log('-------- car.js -----------');
+console.log('-------- carServer.js -----------');
 
 const server = new BPMNClient(HOST, PORT, API_KEY);
 
@@ -25,10 +25,11 @@ let instanceId;
 Feature('Buy Used Car- clean and repair', () => {
     Scenario('Simple', () => {
         Given('Start Buy Used Car Process', async () => {
-            response = await server.engine.start(name, { caseId: caseId });
+            response = await server.engine.start(name, { caseId: caseId },null, 'remoteUser1');
             instanceId = response.id;
-            console.log('**instanceId', response.id, instanceId);
-            console.log(' after start ', response.data.caseId);
+
+            //console.log('**instanceId', response.id, instanceId);
+            //console.log(' after start ', response.data.caseId);
         });
         Then('check for output', () => {
             expect(response.data.caseId).equals(caseId);
@@ -43,7 +44,7 @@ Feature('Buy Used Car- clean and repair', () => {
                 "items.elementId": 'task_Buy'
             };
             console.log(query);
-            response = await server.engine.invoke(query, data);
+            response = await server.engine.invoke(query, data,'RemoteUser2');
         });
 
         When('engine get', async () => {
@@ -67,7 +68,7 @@ Feature('Buy Used Car- clean and repair', () => {
                 "items.elementId": 'task_clean'
             };
             console.log(query);
-            await server.engine.invoke(query, {});
+            await server.engine.invoke(query, {},'remoteUser3');
         });
 
         and('Repair it', async () => {
@@ -79,7 +80,7 @@ Feature('Buy Used Car- clean and repair', () => {
                 id: instanceId,
                 "items.elementId": 'task_Drive'
             };
-            response = await server.engine.invoke(query, {});
+            response = await server.engine.invoke(query, {},'remote_user4');
         });
 
         and('Case Complete', async () => {

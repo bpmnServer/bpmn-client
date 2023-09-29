@@ -17,10 +17,13 @@ interface IItemData {
     data: any;
     messageId;
     signalId;
-    assignments;
-    authorizations;
-    notifications;
     vars;
+    assignee;
+    candidateGroups;
+    candidateUsers;
+    dueDate;
+    followUpDate;
+    priority;
 }
 interface IInstanceData {
     id;
@@ -36,8 +39,6 @@ interface IInstanceData {
     tokens;
     loops;
     parentItemId;   // used for subProcess Calls
-    involvements;
-    authorizations;
 }
 
 

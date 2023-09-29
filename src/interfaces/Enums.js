@@ -65,15 +65,15 @@ var EXECUTION_EVENT;
 /*
  *  possible actions by node
  */
-//   must be same as above
 var NODE_ACTION;
 (function (NODE_ACTION) {
     NODE_ACTION[NODE_ACTION["continue"] = 1] = "continue";
     NODE_ACTION[NODE_ACTION["wait"] = 2] = "wait";
     NODE_ACTION[NODE_ACTION["end"] = 3] = "end";
-    NODE_ACTION[NODE_ACTION["stop"] = 4] = "stop";
-    NODE_ACTION[NODE_ACTION["error"] = 5] = "error";
-    NODE_ACTION[NODE_ACTION["abort"] = 6] = "abort";
+    NODE_ACTION[NODE_ACTION["cancel"] = 4] = "cancel";
+    NODE_ACTION[NODE_ACTION["stop"] = 5] = "stop";
+    NODE_ACTION[NODE_ACTION["error"] = 6] = "error";
+    NODE_ACTION[NODE_ACTION["abort"] = 7] = "abort";
 })(NODE_ACTION || (exports.NODE_ACTION = NODE_ACTION = {}));
 ;
 var ITEM_STATUS;
