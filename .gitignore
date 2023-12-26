@@ -1,4 +1,5 @@
-﻿/node_modules
+﻿.env
+/node_modules
 /obj
 *.log
 *.cmd
@@ -6,7 +7,6 @@
 *.njsproj
 *.njsproj.user
 *.txt
-/bin
 *.log
 *.cmd
 *.bat
@@ -15,4 +15,3 @@
 *.njsproj.user
 *.txt
 *.tgz
-/bin

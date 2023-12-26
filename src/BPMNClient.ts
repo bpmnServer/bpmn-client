@@ -1,6 +1,5 @@
 import { IInstanceData, IItemData , IDefinitionData} from './interfaces/DataObjects';
 import {WebService} from './WebService';
-console.log("BPMNClient 1.2");
 
 
 class BPMNClient extends WebService {
@@ -104,8 +103,9 @@ class ClientEngine {
         const instance = ret as IInstanceData;
         return instance;
     }
-    async invoke(query, data, userId= null): Promise<IInstanceData> {
-        const ret = await this.client.put('engine/invoke', { query, data , userId });
+    async invoke(query, data, userId= null,options={}): Promise<IInstanceData> {
+        console.log('invoke',options);
+        const ret = await this.client.put('engine/invoke', { query, data , userId ,options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);

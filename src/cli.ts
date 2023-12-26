@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+
+
 //import { BPMNClient } from "bpmn-client";
 import { BPMNClient } from './';
 

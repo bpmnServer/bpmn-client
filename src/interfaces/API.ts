@@ -1,13 +1,13 @@
 import { IInstanceData, IItemData , IDefinitionData} from './DataObjects';
 
 
-export interface IBPMNClient  {
-    engine: IClientEngine;
-    datastore: IClientDatastore;
-    definitions: IClientDefinitions;
+export interface IBPMNRequest {
+    engine: IEngine;
+    datastore: IDatastore;
+    definitions: IDefinitions;
 }
 
-export interface IClientEngine {
+export interface IEngine{
      start(name, data , startNodeId ,  userId,options ): Promise<IInstanceData>;
      invoke(query, data, userId): Promise<IInstanceData> ;
      assign(query, data, userId,assignment): Promise<IInstanceData>;
@@ -15,12 +15,12 @@ export interface IClientEngine {
      throwSignal(signalId, data, messageMatchingKey);
      status();
 }
-export interface IClientDatastore {
+export interface IDatastore {
      findItems(query): Promise<IItemData[]>; 
      findInstances(query): Promise<IInstanceData[]>;
      deleteInstances(query);
 }
-export interface IClientDefinitions {
+export interface IDefinitions {
      import(name, pathToBPMN,pathToSVG);
      list(): Promise<string[]>;
      delete(name) ;
