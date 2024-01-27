@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientDefinitions = exports.ClientDatastore = exports.ClientEngine = exports.BPMNClient = void 0;
 const WebService_1 = require("./WebService");
-console.log("BPMNClient 1.2");
 class BPMNClient extends WebService_1.WebService {
     constructor(host, port, apiKey) {
         super();
@@ -99,9 +98,10 @@ class ClientEngine {
             return instance;
         });
     }
-    invoke(query, data, userId = null) {
+    invoke(query, data, userId = null, options = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ret = yield this.client.put('engine/invoke', { query, data, userId });
+            console.log('invoke', options);
+            const ret = yield this.client.put('engine/invoke', { query, data, userId, options });
             if (ret['errors']) {
                 console.log(ret['errors']);
                 throw new Error(ret['errors']);

@@ -5,8 +5,9 @@
     "lib": [ "es6" ],
     "sourceMap": false,
     "declaration": false,
-    "listFiles" :  false 
-
+    "listFiles" :  false ,
+    "rootDir": "./src",
+    "outDir": "./dist" 
   },
   "include": [
     "**/*.ts"

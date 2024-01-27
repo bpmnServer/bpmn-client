@@ -2,13 +2,13 @@ import { IInstanceData, IItemData , IDefinitionData} from './interfaces/DataObje
 import {WebService} from './WebService';
 
 
-class BPMNClient extends WebService {
+class BPMNClient2 extends WebService {
     host;
     port;
     apiKey;
-    engine: ClientEngine;
-    datastore: ClientDatastore;
-    definitions: ClientDefinitions;
+    engine: ClientEngine2;
+    data: ClientData2;
+    model: ClientModel2;
 
     constructor(host, port, apiKey) {
         super();
@@ -16,25 +16,25 @@ class BPMNClient extends WebService {
         this.host = host;
         this.port = port;
         this.apiKey = apiKey;
-        this.engine = new ClientEngine(this);
-        this.datastore = new ClientDatastore(this);
-        this.definitions = new ClientDefinitions(this);
+        this.engine = new ClientEngine2(this);
+        this.data = new ClientData2(this);
+        this.model = new ClientModel2(this);
     }
 
-    async get(url, data = {}) {
-        return await this.request(url, 'GET', data);
+    async get(url,params) {
+        return await this.request(url, 'GET', params);
 
     }
-    async post(url, data = {}) {
-        return await this.request(url, 'POST', data);
+    async post(url,params) {
+        return await this.request(url, 'POST', params);
 
     }
-    async put(url, data = {}) {
-        return await this.request(url, 'PUT', data);
+    async put(url,params) {
+        return await this.request(url, 'PUT', params);
 
     }
-    async del(url, data = {}) {
-        return await this.request(url, 'DELETE', data);
+    async del(url, params) {
+        return await this.request(url, 'DELETE', params);
 
     }
 
@@ -67,7 +67,7 @@ class BPMNClient extends WebService {
             options = {
                 host: this.host,
                 port: this.port,
-                path: '/api/' + url,
+                path: '/api2/' + url,
                 method: method,
                 headers: headers
             };
@@ -76,7 +76,7 @@ class BPMNClient extends WebService {
             options = {
                 host: this.host,
                 port: this.port,
-                path: '/api/' + url,
+                path: '/api2/' + url,
                 method: method
             };
         }
@@ -87,15 +87,15 @@ class BPMNClient extends WebService {
 
 }
 
-class ClientEngine {
-    private client: BPMNClient;
+class ClientEngine2 {
+    private client: BPMNClient2;
 
     constructor(client) {
         this.client = client;
     }
-    async start(name, data = {}, startNodeId = null,  userId= null,options = {}): Promise<IInstanceData> {
+    async start(name, data = {}, user ,options = {}): Promise<IInstanceData> {
         const ret = await this.client.post('engine/start',
-            { name, data, startNodeId, userId, options });
+            { name, data, user, options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
@@ -103,9 +103,10 @@ class ClientEngine {
         const instance = ret as IInstanceData;
         return instance;
     }
-    async invoke(query, data, userId= null,options={}): Promise<IInstanceData> {
+    async invoke(query, data, user,options={}): Promise<IInstanceData> {
         console.log('invoke',options);
-        const ret = await this.client.put('engine/invoke', { query, data , userId ,options });
+        const ret = await this.client.put('engine/invoke',
+             { query, data , user ,options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
@@ -113,8 +114,9 @@ class ClientEngine {
         const instance = ret['instance'] as IInstanceData;
         return instance;
     }
-    async assign(query, data, userId= null,assignment): Promise<IInstanceData> {
-        const ret = await this.client.put('engine/assign', { query, data , userId,assignment });
+    async assign(query, data, assignment,user): Promise<IInstanceData> {
+        const ret = await this.client.put('engine/assign',
+             { query, data ,assignment, user });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
@@ -123,49 +125,37 @@ class ClientEngine {
         return instance;
     }
 
-    async throwMessage(messageId, data = {} , messageMatchingKey = {}) {
-        const ret = await this.client.post('engine/throwMessage', { "messageId": messageId, "data": data, messageMatchingKey });
+    async throwMessage(messageId, data = {} , messageMatchingKey = {} ,user, options) {
+        const ret = await this.client.post('engine/throwMessage',
+             { "messageId": messageId, "data": data, messageMatchingKey,user,options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
         }
         return ret;
     }
-    async throwSignal(signalId, data = {} , messageMatchingKey = {}) {
-        const ret = await this.client.post('engine/throwSignal', { "signalId": signalId, "data": data, messageMatchingKey });
-        if (ret['errors']) {
+    async throwSignal(signalId, data = {} , messageMatchingKey = {} ,user, options) {
+        const ret = await this.client.post('engine/throwSignal', 
+            { "signalId": signalId, "data": data, messageMatchingKey,user,options });
+
+            if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
         }
         return ret;
     }
 
-    async get(query): Promise<IInstanceData> {
-        const ret = await this.client.get('engine/get', query);
-        if (ret['errors']) {
-            console.log(ret['errors']);
-            throw new Error(ret['errors']);
-        }
-        const instance = ret['instance'] as IInstanceData;
-        return instance;
-    }
-    async status() {
-        const ret = await this.client.get('engine/status', {});
-        if (ret['errors']) {
-            console.log(ret['errors']);
-            throw new Error(ret['errors']);
-        }
-        return ret;
-    }
 }
-class ClientDatastore {
-    private client: BPMNClient;
+class ClientData2 {
+    private client: BPMNClient2;
 
     constructor(client) {
         this.client = client;
     }
-    async findItems(query): Promise<IItemData[]> {
-        var res = await this.client.get('datastore/findItems', query);
+    async findItems(query,user): Promise<IItemData[]> {
+        var res = await this.client.get('data/findItems', 
+            {query,user});
+
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -174,8 +164,9 @@ class ClientDatastore {
         return items;
 
     }
-    async findInstances(query): Promise<IInstanceData[]> {
-        const res = await this.client.get('datastore/findInstances', query);
+    async findInstances(query,user): Promise<IInstanceData[]> {
+        const res = await this.client.get('data/findInstances', 
+            {query,user});
 
         if (res['errors']) {
             console.log(res['errors']);
@@ -184,24 +175,25 @@ class ClientDatastore {
         const instances = res['instances'] as IInstanceData[];
         return instances;
     }
-    async deleteInstances(query) {
-        return await this.client.del('datastore/deleteInstances', query);
+    async deleteInstances(query,user) {
+        return await this.client.del('data/deleteInstances', 
+            {query,user});
     }
 }
-class ClientDefinitions {
-    private client: BPMNClient;
+class ClientModel2 {
+    private client: BPMNClient2;
 
     constructor(client) {
         this.client = client;
     }
     
-    async import(name, pathToBPMN,pathToSVG=null) {
+    async import(name, pathToBPMN,pathToSVG=null,user) {
 
         var options = {
             'method': 'POST',
             'host': this.client.host,
             'port': this.client.port,
-            'path': '/api/definitions/import/' + name,
+            'path': '/api/model/import/' + name,
             'headers': {
                 'x-api-key': this.client.apiKey
             },
@@ -216,7 +208,7 @@ class ClientDefinitions {
 
     }
     async list(): Promise<string[]> {
-        var res = await this.client.get('definitions/list', []);
+        var res = await this.client.get('model/list', []);
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -225,7 +217,7 @@ class ClientDefinitions {
 
     }
     async delete(name) {
-        const res = await this.client.post('definitions/delete/', { name });
+        const res = await this.client.post('model/delete/', { name });
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -235,7 +227,7 @@ class ClientDefinitions {
 
     }
     async rename(name,newName) {
-        const res = await this.client.post('definitions/rename/', { name , newName });
+        const res = await this.client.post('model/rename/', { name , newName });
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -245,7 +237,7 @@ class ClientDefinitions {
 
     }
     async load(name): Promise<IDefinitionData> {
-        const res = await this.client.get(encodeURI('definitions/load/' + name), { name });
+        const res = await this.client.get(encodeURI('model/load/' + name), { name });
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -262,4 +254,4 @@ class ClientDefinitions {
 }
 
 
-export { BPMNClient , ClientEngine,ClientDatastore , ClientDefinitions}
+export { BPMNClient2 , ClientEngine2,ClientData2 , ClientModel2}
