@@ -18,6 +18,9 @@ cd bpmn-client-sample
 npm install
 
 npm run setup
+
+npm run cli
+
 ```
 the above setup command will copy .env 
 You can edit .env file to point to your implementation of `bpmn-server`
