@@ -9,17 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ClientModel = exports.ClientData = exports.ClientEngine = exports.BPMNClient = void 0;
+exports.ClientModel2 = exports.ClientData2 = exports.ClientEngine2 = exports.BPMNClient2 = void 0;
 const WebService_1 = require("./WebService");
-class BPMNClient extends WebService_1.WebService {
+class BPMNClient2 extends WebService_1.WebService {
     constructor(host, port, apiKey) {
         super();
         this.host = host;
         this.port = port;
         this.apiKey = apiKey;
-        this.engine = new ClientEngine(this);
-        this.data = new ClientData(this);
-        this.model = new ClientModel(this);
+        this.engine = new ClientEngine2(this);
+        this.data = new ClientData2(this);
+        this.model = new ClientModel2(this);
     }
     get(url, params) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -82,8 +82,8 @@ class BPMNClient extends WebService_1.WebService {
         });
     }
 }
-exports.BPMNClient = BPMNClient;
-class ClientEngine {
+exports.BPMNClient2 = BPMNClient2;
+class ClientEngine2 {
     constructor(client) {
         this.client = client;
     }
@@ -142,8 +142,8 @@ class ClientEngine {
         });
     }
 }
-exports.ClientEngine = ClientEngine;
-class ClientData {
+exports.ClientEngine2 = ClientEngine2;
+class ClientData2 {
     constructor(client) {
         this.client = client;
     }
@@ -175,8 +175,8 @@ class ClientData {
         });
     }
 }
-exports.ClientData = ClientData;
-class ClientModel {
+exports.ClientData2 = ClientData2;
+class ClientModel2 {
     constructor(client) {
         this.client = client;
     }
@@ -249,4 +249,4 @@ class ClientModel {
         }
     }
 }
-exports.ClientModel = ClientModel;
+exports.ClientModel2 = ClientModel2;

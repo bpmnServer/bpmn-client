@@ -121,6 +121,18 @@ class ClientEngine {
             return instance;
         });
     }
+    restart(query, data, userId = null, options = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('invoke', options);
+            const ret = yield this.client.put('engine/restart', { query, data, userId, options });
+            if (ret['errors']) {
+                console.log(ret['errors']);
+                throw new Error(ret['errors']);
+            }
+            const instance = ret['instance'];
+            return instance;
+        });
+    }
     throwMessage(messageId, data = {}, messageMatchingKey = {}) {
         return __awaiter(this, void 0, void 0, function* () {
             const ret = yield this.client.post('engine/throwMessage', { "messageId": messageId, "data": data, messageMatchingKey });

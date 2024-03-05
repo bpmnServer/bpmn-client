@@ -19,7 +19,6 @@ function raw1() {
             headers: {
                 'x-api-key': '12345',
                 'Content-Type': 'application/json',
-                //            'Cookie': 'connect.sid=s%3AFJpzbs-nlVsxrhROzC_e0joMyopi6ke0.uoCjT87OZa3SOJosZxXCrC7zriAIVdMmtwcKsrY2C4I'
             },
             data: data
         };
