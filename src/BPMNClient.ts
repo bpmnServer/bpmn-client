@@ -149,6 +149,14 @@ class ClientEngine {
         }
         return ret;
     }
+    async startEvent(instanceId,startNodeId, data = {}) {
+        const ret = await this.client.put('engine/startEvent', { "instanceId": instanceId,"startNodeId":startNodeId, "data": data});
+        if (ret['errors']) {
+            console.log(ret['errors']);
+            throw new Error(ret['errors']);
+        }
+        return ret;
+    }
 
     async get(query): Promise<IInstanceData> {
         const ret = await this.client.get('engine/get', query);

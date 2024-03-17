@@ -153,6 +153,16 @@ class ClientEngine {
             return ret;
         });
     }
+    startEvent(instanceId, startNodeId, data = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ret = yield this.client.put('engine/startEvent', { "instanceId": instanceId, "startNodeId": startNodeId, "data": data });
+            if (ret['errors']) {
+                console.log(ret['errors']);
+                throw new Error(ret['errors']);
+            }
+            return ret;
+        });
+    }
     get(query) {
         return __awaiter(this, void 0, void 0, function* () {
             const ret = yield this.client.get('engine/get', query);

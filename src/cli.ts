@@ -11,14 +11,36 @@ const res = dotenv.config();
 
 const server = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
-const cl = readline.createInterface( process.stdin, process.stdout );
-const question = function(q) {
-  return new Promise( (res, rej) => {
-      cl.question( q, answer => {
-          res(answer);
-      })
-  });
-};
+
+const question = function(q):Promise<string> {
+
+	const cl = readline.createInterface( process.stdin, process.stdout );
+
+	console.log(q);
+    cl.setPrompt('>');
+    cl.prompt();
+  
+    return new Promise( (res, rej) => {
+        cl.on('line', answer => {
+			answer=removeBS(answer);
+	        res(answer);
+			cl.close();
+        })
+    });
+}
+function removeBS(str:string):string {
+	if (str.indexOf('\b')===-1)
+		return str;
+	let l;
+	while(str.indexOf('\b')>-1)
+	{
+		l=str.indexOf('\b');
+		str=str.substring(0,l-1)+str.substring(l+1);
+
+	}
+	return str;
+
+}
 
 completeUserTask();
 
@@ -33,7 +55,10 @@ function menu() {
 	console.log('	i	Invoke Task');
 	console.log('	sgl	Signal Task');
 	console.log('	msg	Message Task');
+	console.log('	se	Start Event');
+	console.log('	rs	Restart an Instance');
 	console.log('	d	delete instnaces');
+	console.log('	lm	List of Models');
 	console.log('	?	repeat this list');
 
 }
@@ -45,7 +70,7 @@ async function completeUserTask() {
   var command;
   while(option!=='q')
   {
-	command= await question('Enter Command, q to quit\n\r>');
+	command= await question('Enter Command, q to quit\n\r');
 	let opts=command.split(' ');
 	option=opts[0];
 	switch(option)
@@ -86,6 +111,22 @@ async function completeUserTask() {
 			console.log("Message Process");
 			await message();
 			break;
+		case 'rs':
+			console.log("restarting a workflow");
+			await restart();
+			break;
+		case 'se':
+			console.log("Start Event");
+			await startEvent();
+			break;
+	
+		case 'lm':
+			console.log("listing Models");
+			var list=await server.definitions.list();
+			list.forEach(m=>{console.log(m['name']);});
+			
+
+			break;
 
 		case 'd':
 			console.log("deleting");
@@ -99,29 +140,47 @@ async function completeUserTask() {
 
   console.log("bye");
  
-  cl.close();
+  
+}
+async function getCriteria(prompt) {
+	const answer = await question(prompt+',in name value pair; example: items.status wait ');
+	let str=''+ answer;
+
+	if (str.trim()==='')
+		return {};
+
+	//const list = str.match(/li(".*?"|[^"\s]+)+(?=\s*|\s*$)/g);//.match(/(?:[^\s"]+|"[^"]*")+/g);//str.split(' ');
+	const list = str.split(/ +(?=(?:(?:[^"]*"){2})*[^"]*$)/g);
+	
+	if ((list.length % 2)!==0)
+		{
+			console.log("must be pairs");
+			return await getCriteria(prompt);
+		}
+
+	let criteria = {};
+	console.log(list);
+	for (var i = 0; i < list.length; i += 2) {
+		let key=list[i];
+		if (key.startsWith('"'))
+			key=key.substring(1,key.length-1);
+		let val=list[i+1]
+		if (val.startsWith('"'))
+			val=val.substring(1,val.length-1);
+		console.log(key,val);
+		criteria[key] = val;
+    }
+	console.log(criteria);	
+
+	return criteria;
 
 }
+
 async function start()
 {
   const name = await question('Please provide your process name: ');
-  let taskData = await question('Please provide your Task Data (json obj) if any: ');
+  let taskData = await getCriteria('Please provide your Task Data ');
 
-	console.log(taskData);
-
-	try {
-		if (taskData === "") {
-			taskData = {};
-		} else {
-			taskData = JSON.parse(taskData.toString());
-		}
-
-	}
-	catch (exc) {
-		console.log(exc);
-		return;
-    }
-  
   let response=await server.engine.start(name, taskData);
 
 	console.log("Process " + name + " started:", 'InstanceId', response.id);
@@ -138,17 +197,8 @@ async function findItems(query) {
 
 }
 async function listItems() {
-	const answer = await question('Please items criteria name value pair; example: items.status wait ');
-	let str=''+ answer;
 
-	const list = str.split(' ');
-	let criteria = {};
-	console.log(list);
-	for (var i = 0; i < list.length; i += 2) {
-		console.log(list[i], list[i + 1]);
-		criteria[list[i]] = list[i + 1];
-    }
-	console.log(criteria);	
+	const criteria = await getCriteria('provide items criteria');
 
 	var items = await server.datastore.findItems(criteria)
 	console.log(items.length);
@@ -160,9 +210,9 @@ async function listItems() {
 }
 
 async function listInstances() {
-	const name = await question('Please provide your process name: ');
+	const criteria = await getCriteria('provide instance criteria');
 
-	let insts = await server.datastore.findInstances({ name: name})
+	let insts = await server.datastore.findInstances(criteria)
 
 	for (var i = 0; i < insts.length; i++) {
 		let inst = insts[i];
@@ -191,52 +241,44 @@ async function displayInstance(instanceId=null) {
 }
 async function invoke()
 {
-  const instanceId = await question('Please provide your Instance ID: ');
-  const taskId = await question('Please provide your Task ID: ');
-  let taskData = await question('Please provide your Task Data (json obj) if any: ');
-
-  if (taskData === ""){
-      taskData = {};
-  }else{
-      taskData = JSON.parse(taskData.toString());
-  }
+  const criteria = await getCriteria('provide item criteria');
+  const taskData = await getCriteria('provide task data');
 
 	try {
-		let response = await server.engine.invoke(
-			{ id: instanceId, "items.elementId": taskId }
-			, taskData);
+		let response = await server.engine.invoke(criteria, taskData);
 
-		console.log("Completed UserTask:", taskId);
+		console.log("Completed UserTask:", criteria);
 
 		return await displayInstance(response.id);
 	}
 	catch (exc) {
-		console.log("Invoking task failed for:", taskId, instanceId);
-		await findItems({ id: instanceId, "items.elementId": taskId });
-
+		console.log("Invoking task failed for:", criteria);
 
     }
 }
+async function startEvent()
+{
+  const instanceId = await question('Please provide your Instance ID: ');
+  const nodeId = await question('Please provide start Event ID: ');
+  const data = await getCriteria('provide input data');
+
+	try {
+		let response = await server.engine.startEvent(instanceId,nodeId,data);
+
+		return await displayInstance(response.id);
+	}
+	catch (exc) {
+		console.log("Invoking task failed for:", nodeId, instanceId);
+    }
+}
+
 
 async function signal() {
 	const signalId = await question('Please provide signal ID: ');
 
-	let signalData = await question('Please provide your Data (json obj) if any: ');
+	const data = await getCriteria('provide input data');
 
-	//if (typeof signalData === 'string' && signalData.trim() === '') {
-	if (signalData === "") {
-		signalData = {};
-	} else {
-		try {
-			signalData = JSON.parse(signalData.toString());
-		}
-		catch (exc) {
-			console.log(exc);
-			return;
-        }
-	}
-
-	let response = await server.engine.throwSignal(signalId, signalData);
+	let response = await server.engine.throwSignal(signalId, data);
 
 	console.log("Signal Response:", response);
 }
@@ -244,15 +286,9 @@ async function signal() {
 async function message() {
 	const messageId = await question('Please provide message ID: ');
 
-	let messageData = await question('Please provide your Data (json obj) if any: ');
+	const data = await getCriteria('provide input data');
 
-	if (typeof messageData === 'string' && messageData.trim() === '') {
-		messageData = {};
-	} else {
-		messageData = JSON.parse(messageData.toString());
-	}
-
-	let response = await server.engine.throwMessage(messageId, messageData);
+	let response = await server.engine.throwMessage(messageId, data);
 
 	if (response['id'])
 		return await displayInstance(response['id']);
@@ -261,11 +297,25 @@ async function message() {
 		return null;
     }
 }
+async function restart()
+{
+  const query=await getCriteria("Instance Search criteria");
 
+	try {
+		let response = await server.engine.restart(query,{},'');
+		console.log(' Instance restarted: new Instance follows:');
+		return await displayInstance(response.id);
+	}
+	catch (exc) {
+		console.log("Invoking task failed for:", exc);
+
+    }
+}
 async function delInstances() {
-	const name = await question('Please provide process name to delete instances for process: ');
 
-	let response = await server.datastore.deleteInstances({ name: name });
+	const criteria = await getCriteria('provide instance criteria');
+
+	let response = await server.datastore.deleteInstances(criteria);
 
 	console.log("Instances Deleted:", response['result']['deletedCount']);
 }

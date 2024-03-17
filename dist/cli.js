@@ -16,14 +16,29 @@ const readline = require("readline");
 const dotenv = require('dotenv');
 const res = dotenv.config();
 const server = new _1.BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
-const cl = readline.createInterface(process.stdin, process.stdout);
 const question = function (q) {
+    const cl = readline.createInterface(process.stdin, process.stdout);
+    console.log(q);
+    cl.setPrompt('>');
+    cl.prompt();
     return new Promise((res, rej) => {
-        cl.question(q, answer => {
+        cl.on('line', answer => {
+            answer = removeBS(answer);
             res(answer);
+            cl.close();
         });
     });
 };
+function removeBS(str) {
+    if (str.indexOf('\b') === -1)
+        return str;
+    let l;
+    while (str.indexOf('\b') > -1) {
+        l = str.indexOf('\b');
+        str = str.substring(0, l - 1) + str.substring(l + 1);
+    }
+    return str;
+}
 completeUserTask();
 function menu() {
     console.log('Commands:');
@@ -36,7 +51,10 @@ function menu() {
     console.log('	i	Invoke Task');
     console.log('	sgl	Signal Task');
     console.log('	msg	Message Task');
+    console.log('	se	Start Event');
+    console.log('	rs	Restart an Instance');
     console.log('	d	delete instnaces');
+    console.log('	lm	List of Models');
     console.log('	?	repeat this list');
 }
 function completeUserTask() {
@@ -45,7 +63,7 @@ function completeUserTask() {
         let option = '';
         var command;
         while (option !== 'q') {
-            command = yield question('Enter Command, q to quit\n\r>');
+            command = yield question('Enter Command, q to quit\n\r');
             let opts = command.split(' ');
             option = opts[0];
             switch (option) {
@@ -84,6 +102,19 @@ function completeUserTask() {
                     console.log("Message Process");
                     yield message();
                     break;
+                case 'rs':
+                    console.log("restarting a workflow");
+                    yield restart();
+                    break;
+                case 'se':
+                    console.log("Start Event");
+                    yield startEvent();
+                    break;
+                case 'lm':
+                    console.log("listing Models");
+                    var list = yield server.definitions.list();
+                    list.forEach(m => { console.log(m['name']); });
+                    break;
                 case 'd':
                     console.log("deleting");
                     yield delInstances();
@@ -91,26 +122,40 @@ function completeUserTask() {
             }
         }
         console.log("bye");
-        cl.close();
+    });
+}
+function getCriteria(prompt) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const answer = yield question(prompt + ',in name value pair; example: items.status wait ');
+        let str = '' + answer;
+        if (str.trim() === '')
+            return {};
+        //const list = str.match(/li(".*?"|[^"\s]+)+(?=\s*|\s*$)/g);//.match(/(?:[^\s"]+|"[^"]*")+/g);//str.split(' ');
+        const list = str.split(/ +(?=(?:(?:[^"]*"){2})*[^"]*$)/g);
+        if ((list.length % 2) !== 0) {
+            console.log("must be pairs");
+            return yield getCriteria(prompt);
+        }
+        let criteria = {};
+        console.log(list);
+        for (var i = 0; i < list.length; i += 2) {
+            let key = list[i];
+            if (key.startsWith('"'))
+                key = key.substring(1, key.length - 1);
+            let val = list[i + 1];
+            if (val.startsWith('"'))
+                val = val.substring(1, val.length - 1);
+            console.log(key, val);
+            criteria[key] = val;
+        }
+        console.log(criteria);
+        return criteria;
     });
 }
 function start() {
     return __awaiter(this, void 0, void 0, function* () {
         const name = yield question('Please provide your process name: ');
-        let taskData = yield question('Please provide your Task Data (json obj) if any: ');
-        console.log(taskData);
-        try {
-            if (taskData === "") {
-                taskData = {};
-            }
-            else {
-                taskData = JSON.parse(taskData.toString());
-            }
-        }
-        catch (exc) {
-            console.log(exc);
-            return;
-        }
+        let taskData = yield getCriteria('Please provide your Task Data ');
         let response = yield server.engine.start(name, taskData);
         console.log("Process " + name + " started:", 'InstanceId', response.id);
         return yield displayInstance(response.id);
@@ -128,16 +173,7 @@ function findItems(query) {
 }
 function listItems() {
     return __awaiter(this, void 0, void 0, function* () {
-        const answer = yield question('Please items criteria name value pair; example: items.status wait ');
-        let str = '' + answer;
-        const list = str.split(' ');
-        let criteria = {};
-        console.log(list);
-        for (var i = 0; i < list.length; i += 2) {
-            console.log(list[i], list[i + 1]);
-            criteria[list[i]] = list[i + 1];
-        }
-        console.log(criteria);
+        const criteria = yield getCriteria('provide items criteria');
         var items = yield server.datastore.findItems(criteria);
         console.log(items.length);
         for (var j = 0; j < items.length; j++) {
@@ -148,8 +184,8 @@ function listItems() {
 }
 function listInstances() {
     return __awaiter(this, void 0, void 0, function* () {
-        const name = yield question('Please provide your process name: ');
-        let insts = yield server.datastore.findInstances({ name: name });
+        const criteria = yield getCriteria('provide instance criteria');
+        let insts = yield server.datastore.findInstances(criteria);
         for (var i = 0; i < insts.length; i++) {
             let inst = insts[i];
             console.log(`name: ${inst.name} status: ${inst.status}	instanceId:	${inst.id}
@@ -176,58 +212,45 @@ function displayInstance(instanceId = null) {
 }
 function invoke() {
     return __awaiter(this, void 0, void 0, function* () {
-        const instanceId = yield question('Please provide your Instance ID: ');
-        const taskId = yield question('Please provide your Task ID: ');
-        let taskData = yield question('Please provide your Task Data (json obj) if any: ');
-        if (taskData === "") {
-            taskData = {};
-        }
-        else {
-            taskData = JSON.parse(taskData.toString());
-        }
+        const criteria = yield getCriteria('provide item criteria');
+        const taskData = yield getCriteria('provide task data');
         try {
-            let response = yield server.engine.invoke({ id: instanceId, "items.elementId": taskId }, taskData);
-            console.log("Completed UserTask:", taskId);
+            let response = yield server.engine.invoke(criteria, taskData);
+            console.log("Completed UserTask:", criteria);
             return yield displayInstance(response.id);
         }
         catch (exc) {
-            console.log("Invoking task failed for:", taskId, instanceId);
-            yield findItems({ id: instanceId, "items.elementId": taskId });
+            console.log("Invoking task failed for:", criteria);
+        }
+    });
+}
+function startEvent() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const instanceId = yield question('Please provide your Instance ID: ');
+        const nodeId = yield question('Please provide start Event ID: ');
+        const data = yield getCriteria('provide input data');
+        try {
+            let response = yield server.engine.startEvent(instanceId, nodeId, data);
+            return yield displayInstance(response.id);
+        }
+        catch (exc) {
+            console.log("Invoking task failed for:", nodeId, instanceId);
         }
     });
 }
 function signal() {
     return __awaiter(this, void 0, void 0, function* () {
         const signalId = yield question('Please provide signal ID: ');
-        let signalData = yield question('Please provide your Data (json obj) if any: ');
-        //if (typeof signalData === 'string' && signalData.trim() === '') {
-        if (signalData === "") {
-            signalData = {};
-        }
-        else {
-            try {
-                signalData = JSON.parse(signalData.toString());
-            }
-            catch (exc) {
-                console.log(exc);
-                return;
-            }
-        }
-        let response = yield server.engine.throwSignal(signalId, signalData);
+        const data = yield getCriteria('provide input data');
+        let response = yield server.engine.throwSignal(signalId, data);
         console.log("Signal Response:", response);
     });
 }
 function message() {
     return __awaiter(this, void 0, void 0, function* () {
         const messageId = yield question('Please provide message ID: ');
-        let messageData = yield question('Please provide your Data (json obj) if any: ');
-        if (typeof messageData === 'string' && messageData.trim() === '') {
-            messageData = {};
-        }
-        else {
-            messageData = JSON.parse(messageData.toString());
-        }
-        let response = yield server.engine.throwMessage(messageId, messageData);
+        const data = yield getCriteria('provide input data');
+        let response = yield server.engine.throwMessage(messageId, data);
         if (response['id'])
             return yield displayInstance(response['id']);
         else {
@@ -236,10 +259,23 @@ function message() {
         }
     });
 }
+function restart() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const query = yield getCriteria("Instance Search criteria");
+        try {
+            let response = yield server.engine.restart(query, {}, '');
+            console.log(' Instance restarted: new Instance follows:');
+            return yield displayInstance(response.id);
+        }
+        catch (exc) {
+            console.log("Invoking task failed for:", exc);
+        }
+    });
+}
 function delInstances() {
     return __awaiter(this, void 0, void 0, function* () {
-        const name = yield question('Please provide process name to delete instances for process: ');
-        let response = yield server.datastore.deleteInstances({ name: name });
+        const criteria = yield getCriteria('provide instance criteria');
+        let response = yield server.datastore.deleteInstances(criteria);
         console.log("Instances Deleted:", response['result']['deletedCount']);
     });
 }
