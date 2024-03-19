@@ -149,8 +149,8 @@ class ClientEngine {
         }
         return ret;
     }
-    async startEvent(instanceId,startNodeId, data = {}) {
-        const ret = await this.client.put('engine/startEvent', { "instanceId": instanceId,"startNodeId":startNodeId, "data": data});
+    async startEvent(instanceId,startNodeId, data = {}, userId=null,options={}) : Promise<IInstanceData> {
+        const ret = await this.client.put('engine/startEvent', { "instanceId": instanceId,"startNodeId":startNodeId, "data": data, "userName":userId,"options":options});
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
