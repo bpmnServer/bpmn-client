@@ -50,6 +50,8 @@ function test() {
         console.log(response.id);
         response = yield server2.engine.invoke({ id: response.id, "items.elementId": 'task_Buy' }, null, userId, options);
         console.log('invoked', response.id);
+        let insts = yield server1.datastore.findInstances({ "data.caseId": 3030 }, { "name": 1 });
+        console.log(insts);
     });
 }
 function importModel() {

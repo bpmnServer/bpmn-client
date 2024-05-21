@@ -153,9 +153,9 @@ class ClientEngine {
             return ret;
         });
     }
-    startEvent(instanceId, startNodeId, data = {}) {
+    startEvent(instanceId, startNodeId, data = {}, userId = null, options = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ret = yield this.client.put('engine/startEvent', { "instanceId": instanceId, "startNodeId": startNodeId, "data": data });
+            const ret = yield this.client.put('engine/startEvent', { "instanceId": instanceId, "startNodeId": startNodeId, "data": data, "userName": userId, "options": options });
             if (ret['errors']) {
                 console.log(ret['errors']);
                 throw new Error(ret['errors']);
@@ -201,9 +201,9 @@ class ClientDatastore {
             return items;
         });
     }
-    findInstances(query) {
+    findInstances(query, projection = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield this.client.get('datastore/findInstances', query);
+            const res = yield this.client.get('datastore/findInstances', { query, projection });
             if (res['errors']) {
                 console.log(res['errors']);
                 throw new Error(res['errors']);

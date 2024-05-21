@@ -192,8 +192,8 @@ class ClientDatastore {
         return items;
 
     }
-    async findInstances(query): Promise<IInstanceData[]> {
-        const res = await this.client.get('datastore/findInstances', query);
+    async findInstances(query,projection={}): Promise<IInstanceData[]> {
+        const res = await this.client.get('datastore/findInstances', { query,projection});
 
         if (res['errors']) {
             console.log(res['errors']);
