@@ -17,8 +17,8 @@ const axios = require('axios');
 const FormData = require('form-data');
 class WebService {
     constructor() { }
-    invoke(params, options, postData = null) {
-        return __awaiter(this, void 0, void 0, function* () {
+    invoke(params_1, options_1) {
+        return __awaiter(this, arguments, void 0, function* (params, options, postData = null) {
             var data = JSON.stringify(params);
             var url = 'http://' + options.host + ':' + options.port + options.path;
             if (options.port == 443)

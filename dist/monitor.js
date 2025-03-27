@@ -25,8 +25,8 @@ function monitor() {
         }
     });
 }
-function checkStatus(server, reason = '') {
-    return __awaiter(this, void 0, void 0, function* () {
+function checkStatus(server_1) {
+    return __awaiter(this, arguments, void 0, function* (server, reason = '') {
         var list = yield server.engine.status();
         var insT = 0, insR = 0, itmT = 0, itmR = 0, tokT = 0, tokR = 0;
         for (var i = 0; i < list.length; i++) {

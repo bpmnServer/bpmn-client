@@ -87,8 +87,8 @@ class ClientEngine2 {
     constructor(client) {
         this.client = client;
     }
-    start(name, data = {}, user, options = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    start(name_1) {
+        return __awaiter(this, arguments, void 0, function* (name, data = {}, user, options = {}) {
             const ret = yield this.client.post('engine/start', { name, data, user, options });
             if (ret['errors']) {
                 console.log(ret['errors']);
@@ -98,8 +98,8 @@ class ClientEngine2 {
             return instance;
         });
     }
-    invoke(query, data, user, options = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    invoke(query_1, data_1, user_1) {
+        return __awaiter(this, arguments, void 0, function* (query, data, user, options = {}) {
             console.log('invoke', options);
             const ret = yield this.client.put('engine/invoke', { query, data, user, options });
             if (ret['errors']) {
@@ -121,8 +121,8 @@ class ClientEngine2 {
             return instance;
         });
     }
-    throwMessage(messageId, data = {}, messageMatchingKey = {}, user, options) {
-        return __awaiter(this, void 0, void 0, function* () {
+    throwMessage(messageId_1) {
+        return __awaiter(this, arguments, void 0, function* (messageId, data = {}, messageMatchingKey = {}, user, options) {
             const ret = yield this.client.post('engine/throwMessage', { "messageId": messageId, "data": data, messageMatchingKey, user, options });
             if (ret['errors']) {
                 console.log(ret['errors']);
@@ -131,8 +131,8 @@ class ClientEngine2 {
             return ret;
         });
     }
-    throwSignal(signalId, data = {}, messageMatchingKey = {}, user, options) {
-        return __awaiter(this, void 0, void 0, function* () {
+    throwSignal(signalId_1) {
+        return __awaiter(this, arguments, void 0, function* (signalId, data = {}, messageMatchingKey = {}, user, options) {
             const ret = yield this.client.post('engine/throwSignal', { "signalId": signalId, "data": data, messageMatchingKey, user, options });
             if (ret['errors']) {
                 console.log(ret['errors']);
@@ -146,6 +146,17 @@ exports.ClientEngine2 = ClientEngine2;
 class ClientData2 {
     constructor(client) {
         this.client = client;
+    }
+    find(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ filter, sort, limit, after, projection, getTotalCount, user }) {
+            var res = yield this.client.get('datastore/find', { filter, after, limit, sort, projection, getTotalCount });
+            if (res.error) {
+                console.log(res.error);
+                throw new Error(res.error);
+                throw new Error(res['errors']);
+            }
+            return res;
+        });
     }
     findItems(query, user) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -180,8 +191,8 @@ class ClientModel2 {
     constructor(client) {
         this.client = client;
     }
-    import(name, pathToBPMN, pathToSVG = null, user) {
-        return __awaiter(this, void 0, void 0, function* () {
+    import(name_1, pathToBPMN_1) {
+        return __awaiter(this, arguments, void 0, function* (name, pathToBPMN, pathToSVG = null, user) {
             var options = {
                 'method': 'POST',
                 'host': this.client.host,

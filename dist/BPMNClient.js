@@ -21,23 +21,23 @@ class BPMNClient extends WebService_1.WebService {
         this.datastore = new ClientDatastore(this);
         this.definitions = new ClientDefinitions(this);
     }
-    get(url, data = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    get(url_1) {
+        return __awaiter(this, arguments, void 0, function* (url, data = {}) {
             return yield this.request(url, 'GET', data);
         });
     }
-    post(url, data = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    post(url_1) {
+        return __awaiter(this, arguments, void 0, function* (url, data = {}) {
             return yield this.request(url, 'POST', data);
         });
     }
-    put(url, data = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    put(url_1) {
+        return __awaiter(this, arguments, void 0, function* (url, data = {}) {
             return yield this.request(url, 'PUT', data);
         });
     }
-    del(url, data = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    del(url_1) {
+        return __awaiter(this, arguments, void 0, function* (url, data = {}) {
             return yield this.request(url, 'DELETE', data);
         });
     }
@@ -87,8 +87,8 @@ class ClientEngine {
     constructor(client) {
         this.client = client;
     }
-    start(name, data = {}, startNodeId = null, userId = null, options = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    start(name_1) {
+        return __awaiter(this, arguments, void 0, function* (name, data = {}, startNodeId = null, userId = null, options = {}) {
             const ret = yield this.client.post('engine/start', { name, data, startNodeId, userId, options });
             if (ret['errors']) {
                 console.log(ret['errors']);
@@ -98,8 +98,8 @@ class ClientEngine {
             return instance;
         });
     }
-    invoke(query, data, userId = null, options = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    invoke(query_1, data_1) {
+        return __awaiter(this, arguments, void 0, function* (query, data, userId = null, options = {}) {
             console.log('invoke', options);
             const ret = yield this.client.put('engine/invoke', { query, data, userId, options });
             if (ret['errors']) {
@@ -110,8 +110,8 @@ class ClientEngine {
             return instance;
         });
     }
-    assign(query, data, userId = null, assignment) {
-        return __awaiter(this, void 0, void 0, function* () {
+    assign(query_1, data_1) {
+        return __awaiter(this, arguments, void 0, function* (query, data, userId = null, assignment) {
             const ret = yield this.client.put('engine/assign', { query, data, userId, assignment });
             if (ret['errors']) {
                 console.log(ret['errors']);
@@ -121,8 +121,8 @@ class ClientEngine {
             return instance;
         });
     }
-    restart(query, data, userId = null, options = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    restart(query_1, data_1) {
+        return __awaiter(this, arguments, void 0, function* (query, data, userId = null, options = {}) {
             console.log('invoke', options);
             const ret = yield this.client.put('engine/restart', { query, data, userId, options });
             if (ret['errors']) {
@@ -133,8 +133,8 @@ class ClientEngine {
             return instance;
         });
     }
-    throwMessage(messageId, data = {}, messageMatchingKey = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    throwMessage(messageId_1) {
+        return __awaiter(this, arguments, void 0, function* (messageId, data = {}, messageMatchingKey = {}) {
             const ret = yield this.client.post('engine/throwMessage', { "messageId": messageId, "data": data, messageMatchingKey });
             if (ret['errors']) {
                 console.log(ret['errors']);
@@ -143,8 +143,8 @@ class ClientEngine {
             return ret;
         });
     }
-    throwSignal(signalId, data = {}, messageMatchingKey = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    throwSignal(signalId_1) {
+        return __awaiter(this, arguments, void 0, function* (signalId, data = {}, messageMatchingKey = {}) {
             const ret = yield this.client.post('engine/throwSignal', { "signalId": signalId, "data": data, messageMatchingKey });
             if (ret['errors']) {
                 console.log(ret['errors']);
@@ -153,8 +153,8 @@ class ClientEngine {
             return ret;
         });
     }
-    startEvent(instanceId, startNodeId, data = {}, userId = null, options = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    startEvent(instanceId_1, startNodeId_1) {
+        return __awaiter(this, arguments, void 0, function* (instanceId, startNodeId, data = {}, userId = null, options = {}) {
             const ret = yield this.client.put('engine/startEvent', { "instanceId": instanceId, "startNodeId": startNodeId, "data": data, "userName": userId, "options": options });
             if (ret['errors']) {
                 console.log(ret['errors']);
@@ -190,6 +190,17 @@ class ClientDatastore {
     constructor(client) {
         this.client = client;
     }
+    find(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ filter, sort, limit, after, projection, getTotalCount }) {
+            var res = yield this.client.get('datastore/find', { filter, after, limit, sort, projection, getTotalCount });
+            if (res.error) {
+                console.log(res.error);
+                throw new Error(res.error);
+                throw new Error(res['errors']);
+            }
+            return res;
+        });
+    }
     findItems(query) {
         return __awaiter(this, void 0, void 0, function* () {
             var res = yield this.client.get('datastore/findItems', query);
@@ -201,8 +212,8 @@ class ClientDatastore {
             return items;
         });
     }
-    findInstances(query, projection = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
+    findInstances(query_1) {
+        return __awaiter(this, arguments, void 0, function* (query, projection = {}) {
             const res = yield this.client.get('datastore/findInstances', { query, projection });
             if (res['errors']) {
                 console.log(res['errors']);
@@ -223,8 +234,8 @@ class ClientDefinitions {
     constructor(client) {
         this.client = client;
     }
-    import(name, pathToBPMN, pathToSVG = null) {
-        return __awaiter(this, void 0, void 0, function* () {
+    import(name_1, pathToBPMN_1) {
+        return __awaiter(this, arguments, void 0, function* (name, pathToBPMN, pathToSVG = null) {
             var options = {
                 'method': 'POST',
                 'host': this.client.host,

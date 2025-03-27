@@ -10,7 +10,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = require("./");
-testLong();
+test1();
+function test1() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const dotenv = require('dotenv');
+        dotenv.config();
+        console.log('env:', process.env.HOST, process.env.PORT, process.env.API_KEY);
+        const server1 = new _1.BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+        let insts = yield server1.datastore.findInstances({}, { "name": 1, "data": 1 });
+        console.log(insts);
+    });
+}
 function testLong() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('testlong');
@@ -25,7 +35,7 @@ function testLong() {
         let options = { noWait: true };
         const server1 = new _1.BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
         response = yield server1.engine.start(name, { caseId: caseId }, null, userId);
-        console.log(response.id, response.items.length);
+        console.log(response.id, response);
         response.items.forEach(item => { console.log(item.id, item.name, item.type, item.status); });
         response = yield server1.engine.invoke({ id: response.id, "items.elementId": 'UserLong' }, null, userId, options);
         console.log('invoked userLong', response.items.length);
@@ -50,8 +60,6 @@ function test() {
         console.log(response.id);
         response = yield server2.engine.invoke({ id: response.id, "items.elementId": 'task_Buy' }, null, userId, options);
         console.log('invoked', response.id);
-        let insts = yield server1.datastore.findInstances({ "data.caseId": 3030 }, { "name": 1 });
-        console.log(insts);
     });
 }
 function importModel() {

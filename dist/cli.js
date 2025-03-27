@@ -55,6 +55,7 @@ function menu() {
     console.log('	rs	Restart an Instance');
     console.log('	d	delete instnaces');
     console.log('	lm	List of Models');
+    console.log('	es	Engine Status');
     console.log('	?	repeat this list');
 }
 function completeUserTask() {
@@ -114,6 +115,11 @@ function completeUserTask() {
                     console.log("listing Models");
                     var list = yield server.definitions.list();
                     list.forEach(m => { console.log(m['name']); });
+                    break;
+                case 'es':
+                    console.log("Engine Status");
+                    var runnings = yield server.engine.status();
+                    console.log(runnings);
                     break;
                 case 'd':
                     console.log("deleting");
@@ -193,8 +199,8 @@ function listInstances() {
         }
     });
 }
-function displayInstance(instanceId = null) {
-    return __awaiter(this, void 0, void 0, function* () {
+function displayInstance() {
+    return __awaiter(this, arguments, void 0, function* (instanceId = null) {
         if (instanceId == null)
             instanceId = yield question('Please provide your Instance ID: ');
         let insts = yield server.datastore.findInstances({ id: instanceId });

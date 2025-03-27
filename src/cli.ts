@@ -59,6 +59,7 @@ function menu() {
 	console.log('	rs	Restart an Instance');
 	console.log('	d	delete instnaces');
 	console.log('	lm	List of Models');
+	console.log('	es	Engine Status');
 	console.log('	?	repeat this list');
 
 }
@@ -124,10 +125,13 @@ async function completeUserTask() {
 			console.log("listing Models");
 			var list=await server.definitions.list();
 			list.forEach(m=>{console.log(m['name']);});
-			
-
 			break;
-
+		case 'es':
+			console.log("Engine Status");
+			var runnings=await server.engine.status();
+			console.log(runnings);
+		break;				
+	
 		case 'd':
 			console.log("deleting");
 			await delInstances();

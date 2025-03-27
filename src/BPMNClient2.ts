@@ -152,6 +152,41 @@ class ClientData2 {
     constructor(client) {
         this.client = client;
     }
+    async find({
+        filter,
+        sort,
+        limit,
+        after,
+        projection,
+        getTotalCount,
+        user}:
+        {
+            filter?: Record<string, any>;
+            after?: string;
+            limit?: number;
+            sort?: Record<string, 1 | -1>;
+            projection?: Record<string, 0 | 1| any>;
+            getTotalCount?: boolean; // if true, return total count of items in the result set
+            user?:string;
+          }            
+        )
+    : Promise<   { data?: any[];
+                nextCursor?: string | null;
+                totalCount?: number;
+                error?: string; }> {
+    var res = await this.client.get('datastore/find',
+        {filter,after,limit,sort,projection,getTotalCount,user}
+    );
+    if (res.error) {
+        console.log(res.error);
+        throw new Error(res.error);
+        
+        throw new Error(res['errors']);
+    }
+    return res;
+
+    }
+
     async findItems(query,user): Promise<IItemData[]> {
         var res = await this.client.get('data/findItems', 
             {query,user});

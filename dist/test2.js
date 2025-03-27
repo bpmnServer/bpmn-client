@@ -11,47 +11,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = require("./");
 test();
-function testLong() {
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log('testlong');
-        const dotenv = require('dotenv');
-        dotenv.config();
-        console.log('env:', process.env.HOST, process.env.PORT, process.env.API_KEY);
-        var caseId = Math.floor(Math.random() * 10000);
-        let name = 'test-concurrency';
-        let response;
-        let instanceId;
-        let userId = 'user1';
-        let options = {}; //noWait:true};
-        const server1 = new _1.BPMNClient2(process.env.HOST, process.env.PORT, process.env.API_KEY);
-        console.log('starting process', name);
-        response = yield server1.engine.start(name, { caseId: caseId }, null, userId);
-        console.log(response.id, response.items.length);
-        response.items.forEach(item => { console.log(item.id, item.name, item.type, item.status); });
-        console.log('invoking UserLong');
-        response = yield server1.engine.invoke({ id: response.id, "items.elementId": 'UserLong' }, null, userId, options);
-        console.log('invoked userLong', response.items.length);
-        console.log('invoking UserShort');
-        response = yield server1.engine.invoke({ id: response.id, "items.elementId": 'UserShort' }, null, userId, options);
-        console.log('invoked userShort', response.items.length);
-    });
-}
 function test() {
     return __awaiter(this, void 0, void 0, function* () {
         const dotenv = require('dotenv');
         dotenv.config();
         console.log('env:', process.env.HOST, process.env.PORT, process.env.API_KEY);
         var caseId = Math.floor(Math.random() * 10000);
+        let user = { userName: "John", userGroups: ['employee'] };
         let name = 'Buy Used Car';
         let response;
         let instanceId;
-        let userId = 'user1';
         let options = { noWait: true };
         const server1 = new _1.BPMNClient2(process.env.HOST, process.env.PORT, process.env.API_KEY);
-        //        const server2 = new BPMNClient2(process.env.HOST, 300, process.env.API_KEY);
-        response = yield server1.engine.start(name, { caseId: caseId }, userId, options);
+        response = yield server1.engine.start(name, { caseId: caseId }, user, options);
         console.log(response.id);
-        response = yield server1.engine.invoke({ id: response.id, "items.elementId": 'task_Buy' }, null, userId, options);
+        response = yield server1.engine.invoke({ id: response.id, "items.elementId": 'task_Buy' }, null, user, options);
         console.log('invoked', response.id);
     });
 }
