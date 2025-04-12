@@ -191,8 +191,8 @@ class ClientDatastore {
         this.client = client;
     }
     find(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ filter, sort, limit, after, projection, getTotalCount }) {
-            var res = yield this.client.get('datastore/find', { filter, after, limit, sort, projection, getTotalCount });
+        return __awaiter(this, arguments, void 0, function* ({ filter, sort, limit, after, projection, lastItem, latestItem, getTotalCount }) {
+            var res = yield this.client.get('datastore/find', { filter, after, limit, sort, projection, lastItem, latestItem, getTotalCount });
             if (res.error) {
                 console.log(res.error);
                 throw new Error(res.error);

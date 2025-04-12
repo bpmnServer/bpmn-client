@@ -158,6 +158,8 @@ class ClientData2 {
         limit,
         after,
         projection,
+        lastItem,
+		latestItem,
         getTotalCount,
         user}:
         {
@@ -166,6 +168,8 @@ class ClientData2 {
             limit?: number;
             sort?: Record<string, 1 | -1>;
             projection?: Record<string, 0 | 1| any>;
+            lastItem?: Record<string, any>;
+            latestItem?: Record<string,any>;
             getTotalCount?: boolean; // if true, return total count of items in the result set
             user?:string;
           }            
@@ -175,7 +179,7 @@ class ClientData2 {
                 totalCount?: number;
                 error?: string; }> {
     var res = await this.client.get('datastore/find',
-        {filter,after,limit,sort,projection,getTotalCount,user}
+        {filter,after,limit,sort,projection,lastItem,latestItem,getTotalCount,user}
     );
     if (res.error) {
         console.log(res.error);

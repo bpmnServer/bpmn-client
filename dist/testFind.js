@@ -20,7 +20,7 @@ function test() {
         const res = yield server1.datastore.find({
             filter: { "items.type": "bpmn:UserTask" },
             sort: { 'items.startedAt': 1 },
-            limit: 20, // limit
+            //limit:20, // limit
             projection: { id: 1, "_id": 1, name: 1, startedAt: 1, status: 1,
                 "items.name": 1, "items.startedAt": 1, "items.type": 1, "items.status": 1 },
             getTotalCount: true
