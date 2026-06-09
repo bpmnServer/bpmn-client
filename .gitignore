@@ -15,3 +15,5 @@
 *.njsproj.user
 *.txt
 *.tgz
+'.env' 
+.env
