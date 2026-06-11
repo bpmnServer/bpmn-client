@@ -1,5 +1,6 @@
-const fs = require('fs');
-const readline = require("readline");
+#!/usr/bin/env node
+import * as fs from 'fs';
+import * as readline from 'readline';
 const cl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: false });
 const question = function (q) {
     return new Promise((res, rej) => {
@@ -20,3 +21,4 @@ function createEnv() {
         console.log('.env file already exists.');
     process.exit();
 }
+//# sourceMappingURL=setup.js.map

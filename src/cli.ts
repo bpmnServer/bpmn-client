@@ -2,11 +2,11 @@
 
 
 //import { BPMNClient } from "bpmn-client";
-import { BPMNClient } from './';
+import { BPMNClient } from './index.js';
 
 import * as readline from 'readline';
+import dotenv from 'dotenv';
 
-const dotenv = require('dotenv');
 const res = dotenv.config();
 
 const server = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);

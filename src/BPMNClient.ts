@@ -1,5 +1,5 @@
-import { IInstanceData, IItemData , IDefinitionData} from './interfaces/DataObjects';
-import {WebService} from './WebService';
+import { IInstanceData, IItemData , IDefinitionData} from './interfaces/DataObjects.js';
+import {WebService} from './WebService.js';
 
 
 class BPMNClient extends WebService {

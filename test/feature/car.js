@@ -1,4 +1,4 @@
-const {  BPMNClient } = require("../../src/");
+import { BPMNClient } from "../../src/index.js";
 
 
 

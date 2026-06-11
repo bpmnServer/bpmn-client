@@ -1,15 +1,23 @@
 {
   "name": "bpmn-client",
-  "version": "2.3.5",
+  "version": "3.0.0",
   "license": "MIT",
-  "main":"./dist/index.js",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc --build",
-    "compileRun": "tsc --build && node cli.js",
-    "cli": "ts-node src/cli",
     "clean": "tsc --build --clean",
-    "start": "node cli.ts",
-    "test": "mocha -exit --config=test\\.mocharc.json"
+    "start": "node --import tsx src/cli.ts",
+    "cli": "node --import tsx src/cli.ts",
+    "setup": "node --import tsx src/setup.ts",
+    "test": "node --import tsx ./node_modules/mocha/bin/mocha.js --config=test/.mocharc.json"
   },
   "description": "Client API for BPMN-Server webservices",
   "keywords": [
@@ -27,28 +35,26 @@
     "url": "git+https:github.com/ralphhanna/bpmn-client.git"
   },
   "bin": {
-    "bpmn-client-setup": "./bin/setup.js",
-    "bpmn-client-cli": "./bin/cli.js"
+    "bpmn-client-setup": "./dist/setup.js",
+    "bpmn-client-cli": "./dist/cli.js"
   },
   "files": [
-    "bin",
     "dist"
   ],
   "dependencies": {
-    "axios": "^1.3.4",
-    "connect-busboy": "0.0.2",
-    "core-js": "^3.6.5",
-    "dotenv": "^16.0.1"
+    "axios": "^1.17.0",
+    "dotenv": "^17.4.2",
+    "form-data": "^4.0.4"
   },
   "devDependencies": {
-    "@types/mime": "^1.3.1",
-    "@types/node": "^12.12.7",
-    "@types/serve-static": "^1.7.32",
-    "nodemon": "^2.0.19",
-    "ts-node": "^8.10.2",
-    "typescript": "^3.9.7"
+    "@types/node": "^22.0.0",
+    "chai": "^5.1.2",
+    "mocha": "^11.0.0",
+    "mocha-cakes-2": "^3.3.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.0"
   },
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=20.0.0"
   }
 }
