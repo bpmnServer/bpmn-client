@@ -1,4 +1,4 @@
-import { IInstanceData, IItemData , IDefinitionData} from './DataObjects';
+import { IInstanceData, IItemData , IDefinitionData} from './DataObjects.js';
 
 
 export interface IBPMNRequest {

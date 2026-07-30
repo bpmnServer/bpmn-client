@@ -1,5 +1,5 @@
-import { IInstanceData, IItemData , IDefinitionData} from './interfaces/DataObjects';
-import {WebService} from './WebService';
+import { IInstanceData, IItemData , IDefinitionData} from './interfaces/DataObjects.js';
+import {WebService} from './WebService.js';
 
 
 class BPMNClient extends WebService {
@@ -149,6 +149,14 @@ class ClientEngine {
         }
         return ret;
     }
+    async startEvent(instanceId,startNodeId, data = {}, userId=null,options={}) : Promise<IInstanceData> {
+        const ret = await this.client.put('engine/startEvent', { "instanceId": instanceId,"startNodeId":startNodeId, "data": data, "userName":userId,"options":options});
+        if (ret['errors']) {
+            console.log(ret['errors']);
+            throw new Error(ret['errors']);
+        }
+        return ret;
+    }
 
     async get(query): Promise<IInstanceData> {
         const ret = await this.client.get('engine/get', query);
@@ -174,6 +182,42 @@ class ClientDatastore {
     constructor(client) {
         this.client = client;
     }
+    async find({
+            filter,
+            sort,
+            limit,
+            after,
+            projection,
+            lastItem,
+            latestItem,
+            getTotalCount}:
+            {
+                filter?: Record<string, any>;
+                after?: string;
+                limit?: number;
+                sort?: Record<string, 1 | -1>;
+                projection?: Record<string, 0 | 1| any>;
+                lastItem?: Record<string, any>;
+                latestItem?: Record<string, any>;
+                getTotalCount?: boolean; // if true, return total count of items in the result set
+              }            
+            )
+        : Promise<   { data?: any[];
+                    nextCursor?: string | null;
+                    totalCount?: number;
+                    error?: string; }> {
+        var res = await this.client.get('datastore/find',
+            {filter,after,limit,sort,projection,lastItem,latestItem,getTotalCount}
+        );
+        if (res.error) {
+            console.log(res.error);
+            throw new Error(res.error);
+            
+            throw new Error(res['errors']);
+        }
+        return res;
+
+    }
     async findItems(query): Promise<IItemData[]> {
         var res = await this.client.get('datastore/findItems', query);
         if (res['errors']) {
@@ -184,8 +228,8 @@ class ClientDatastore {
         return items;
 
     }
-    async findInstances(query): Promise<IInstanceData[]> {
-        const res = await this.client.get('datastore/findInstances', query);
+    async findInstances(query,projection={}): Promise<IInstanceData[]> {
+        const res = await this.client.get('datastore/findInstances', { query,projection});
 
         if (res['errors']) {
             console.log(res['errors']);

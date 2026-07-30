@@ -1,6 +1,16 @@
 import { BPMNClient } from './';
 
-testLong();
+test1();
+async function test1() {
+        const dotenv = require('dotenv');
+        dotenv.config();
+        console.log('env:',process.env.HOST, process.env.PORT, process.env.API_KEY);
+
+        const server1 = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+        
+        let insts=await server1.datastore.findInstances({},{"name":1,"data":1});
+        console.log(insts);
+}
 async function testLong() {
         console.log('testlong');
         const dotenv = require('dotenv');
@@ -19,7 +29,7 @@ async function testLong() {
         const server1 = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
         response = await server1.engine.start(name, {caseId: caseId},null,userId);
-        console.log(response.id,response.items.length);
+        console.log(response.id,response);
         response.items.forEach(item=>{console.log(item.id,item.name,item.type,item.status);});
 
         response = await server1.engine.invoke({id: response.id , "items.elementId": 'UserLong' },null,userId,options);

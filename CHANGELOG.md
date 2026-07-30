@@ -12,5 +12,14 @@ and here
 
 ### Changed
 -->
+## Release 2.2.4 -- 2024-05
+- Fix api dataStore/findInstances(query,projection)
+## Release 2.1.5 -- 2024-03
+- added engine.startEvent
+### cli enhancements
+- support double quotes, so parameters like: `name "Buy Used Car" ` can now work
+- support backspace on input
+
+
 ## Release 2.1.0 -- 2024-03
-added engine.restart
+- added engine.restart

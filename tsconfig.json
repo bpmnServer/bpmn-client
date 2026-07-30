@@ -1,18 +1,26 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es6",
-    "lib": [ "es6" ],
-    "sourceMap": false,
-    "declaration": false,
-    "listFiles" :  false ,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "rootDir": "./src",
-    "outDir": "./dist" 
+    "outDir": "./dist"
   },
-  "include": [
-    "**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "exclude": [
-    "node_modules" , "Sample"
+    "node_modules",
+    "src/test.ts",
+    "src/test2.ts",
+    "src/test3.ts",
+    "src/testFind.ts",
+    "src/test-raw.ts",
+    "src/monitor.ts",
+    "src/remote-import.ts"
   ]
 }

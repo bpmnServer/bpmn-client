@@ -1,9 +1,7 @@
 
-const https = require('https');
-const http = require('http');
-const fs = require("fs");
-const axios = require('axios');
-const FormData = require('form-data');
+import * as fs from 'fs';
+import axios from 'axios';
+import FormData from 'form-data';
 
 class WebService {
     statusCode;
