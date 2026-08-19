@@ -81,7 +81,6 @@ class ClientEngine {
         return instance;
     }
     async invoke(query, data, userId = null, options = {}) {
-        console.log('invoke', options);
         const ret = await this.client.put('engine/invoke', { query, data, userId, options });
         if (ret['errors']) {
             console.log(ret['errors']);
@@ -100,7 +99,6 @@ class ClientEngine {
         return instance;
     }
     async restart(query, data, userId = null, options = {}) {
-        console.log('invoke', options);
         const ret = await this.client.put('engine/restart', { query, data, userId, options });
         if (ret['errors']) {
             console.log(ret['errors']);
@@ -203,9 +201,7 @@ class ClientDefinitions {
             },
             'maxRedirects': 20
         };
-        console.log('import ', name, pathToBPMN, pathToSVG);
         var res = await this.client.upload(name, pathToBPMN, pathToSVG, options);
-        console.log('import done ', res);
         this.checkErrors(res);
         return res;
     }
@@ -223,7 +219,6 @@ class ClientDefinitions {
             console.log(res['errors']);
             throw new Error(res['errors']);
         }
-        console.log(res);
         return res;
     }
     async rename(name, newName) {
@@ -232,7 +227,6 @@ class ClientDefinitions {
             console.log(res['errors']);
             throw new Error(res['errors']);
         }
-        console.log(res);
         return res;
     }
     async load(name) {
@@ -241,7 +235,6 @@ class ClientDefinitions {
             console.log(res['errors']);
             throw new Error(res['errors']);
         }
-        console.log(res);
         return res;
     }
     checkErrors(res) {

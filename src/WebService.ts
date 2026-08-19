@@ -63,7 +63,6 @@ class WebService {
             const response = await axios.post(url, form, {
               headers: options.headers    });
 
-            console.log('Response Status:',response.status,response.data);
             return response.data;
 
         } 

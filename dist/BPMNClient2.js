@@ -81,7 +81,6 @@ class ClientEngine2 {
         return instance;
     }
     async invoke(query, data, user, options = {}) {
-        console.log('invoke', options);
         const ret = await this.client.put('engine/invoke', { query, data, user, options });
         if (ret['errors']) {
             console.log(ret['errors']);
@@ -168,9 +167,7 @@ class ClientModel2 {
             },
             'maxRedirects': 20
         };
-        console.log('import ', name, pathToBPMN, pathToSVG);
         var res = await this.client.upload(name, pathToBPMN, pathToSVG, options);
-        console.log('import done ', res);
         this.checkErrors(res);
         return res;
     }
@@ -188,7 +185,6 @@ class ClientModel2 {
             console.log(res['errors']);
             throw new Error(res['errors']);
         }
-        console.log(res);
         return res;
     }
     async rename(name, newName) {
@@ -197,7 +193,6 @@ class ClientModel2 {
             console.log(res['errors']);
             throw new Error(res['errors']);
         }
-        console.log(res);
         return res;
     }
     async load(name) {
@@ -206,7 +201,6 @@ class ClientModel2 {
             console.log(res['errors']);
             throw new Error(res['errors']);
         }
-        console.log(res);
         return res;
     }
     checkErrors(res) {
