@@ -5,16 +5,21 @@ cbpmn-client
 
 This is a light-weight package to allow remote access to [bpmn-server](https://github.com/bpmnServer/bpmn-server)
 
-Runtime code should use `BPMNClient` or `BPMNClient2`. These clients expose
+New runtime code should use `BPMNClientV1`; deployment tools should use
+`BPMNAdminClientV1`. These clients target the canonical `/api/v1` and
+`/admin/api/v1` contracts. `BPMNClient` and `BPMNClient2` remain compatibility
+clients for the deprecated `/api` and `/api2` routes.
+
+The runtime clients expose
 workflow execution and runtime data operations, but intentionally do not expose
 definition/model mutation. Deployment and administration tools must opt into
 `BPMNAdminClient` or `BPMNAdminClient2` explicitly.
 
 ```ts
-import { BPMNClient2, BPMNAdminClient2 } from 'bpmn-client';
+import { BPMNClientV1, BPMNAdminClientV1 } from 'bpmn-client';
 
-const runtime = new BPMNClient2(host, port, apiKey);
-const admin = new BPMNAdminClient2(host, port, adminApiKey);
+const runtime = new BPMNClientV1(host, port, apiKey);
+const admin = new BPMNAdminClientV1(host, port, adminApiKey);
 
 await runtime.engine.start('order-approval', input, user);
 await admin.model.import('order-approval', './order-approval.bpmn');
