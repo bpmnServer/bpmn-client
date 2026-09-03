@@ -12,6 +12,12 @@ and here
 
 ### Changed
 -->
+## Unreleased — Separate runtime and administration clients (#2)
+
+- Keep workflow execution calls on the runtime client.
+- Introduce explicit administration clients for workflow-definition management.
+- Remove model-management methods from the runtime client contract.
+
 ## Release 2.2.4 -- 2024-05
 - Fix api dataStore/findInstances(query,projection)
 ## Release 2.1.5 -- 2024-03

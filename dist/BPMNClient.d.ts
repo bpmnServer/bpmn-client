@@ -1,13 +1,13 @@
-import { IInstanceData, IItemData, IDefinitionData } from './interfaces/DataObjects.js';
+import { IInstanceData, IItemData } from './interfaces/DataObjects.js';
 import { WebService } from './WebService.js';
 declare class BPMNClient extends WebService {
     host: any;
     port: any;
     apiKey: any;
+    basePath: any;
     engine: ClientEngine;
     datastore: ClientDatastore;
-    definitions: ClientDefinitions;
-    constructor(host: any, port: any, apiKey: any);
+    constructor(host: any, port: any, apiKey: any, basePath?: string);
     get(url: any, data?: {}): Promise<any>;
     post(url: any, data?: {}): Promise<any>;
     put(url: any, data?: {}): Promise<any>;
@@ -49,14 +49,4 @@ declare class ClientDatastore {
     findInstances(query: any, projection?: {}): Promise<IInstanceData[]>;
     deleteInstances(query: any): Promise<any>;
 }
-declare class ClientDefinitions {
-    private client;
-    constructor(client: any);
-    import(name: any, pathToBPMN: any, pathToSVG?: any): Promise<any>;
-    list(): Promise<string[]>;
-    delete(name: any): Promise<IDefinitionData>;
-    rename(name: any, newName: any): Promise<IDefinitionData>;
-    load(name: any): Promise<IDefinitionData>;
-    checkErrors(res: any): void;
-}
-export { BPMNClient, ClientEngine, ClientDatastore, ClientDefinitions };
+export { BPMNClient, ClientEngine, ClientDatastore };

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 //import { BPMNClient } from "bpmn-client";
-import { BPMNClient } from './index.js';
+import { BPMNAdminClient } from './index.js';
 import * as readline from 'readline';
 import dotenv from 'dotenv';
 const res = dotenv.config();
-const server = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+const server = new BPMNAdminClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 const question = function (q) {
     const cl = readline.createInterface(process.stdin, process.stdout);
     console.log(q);

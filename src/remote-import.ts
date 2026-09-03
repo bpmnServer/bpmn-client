@@ -1,7 +1,7 @@
 
 //FromPostMan();
 //request('test4', 'Trans.bpmn');
-import { BPMNClient } from './';
+import { BPMNAdminClient } from './';
 
 
 console.log('remote-import.ts');
@@ -23,7 +23,7 @@ async function badImport()
     const path = require('path');
 
         try{
-            const bpmnServer = new BPMNClient(
+            const bpmnServer = new BPMNAdminClient(
                 '127.0.0.1',
                 3000,
                12345,
@@ -49,7 +49,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 console.log('env:',process.env.HOST, process.env.PORT, process.env.API_KEY);
 
-const server = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+const server = new BPMNAdminClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
     var name = 'test-import';
     var file = '..\\WebApp\\processes\\Trans.bpmn';

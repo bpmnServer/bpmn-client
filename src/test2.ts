@@ -1,4 +1,4 @@
-import { BPMNClient2 } from './';
+import { BPMNAdminClient2 } from './';
 
 test();
 async function test() {
@@ -16,7 +16,7 @@ async function test() {
 
         let options={noWait:true};
 
-        const server1 = new BPMNClient2(process.env.HOST, process.env.PORT, process.env.API_KEY);
+        const server1 = new BPMNAdminClient2(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
         response = await server1.engine.start(name, {caseId: caseId},user,options);
         console.log(response.id);
@@ -35,7 +35,7 @@ async function importModel() {
         dotenv.config();
         console.log('env:',process.env.HOST, process.env.PORT, process.env.API_KEY);
 
-        const server = new BPMNClient2(process.env.HOST, process.env.PORT, process.env.API_KEY);
+        const server = new BPMNAdminClient2(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
     var name = 'test-import';
     var file = '..\\WebApp\\processes\\Trans.bpmn';
