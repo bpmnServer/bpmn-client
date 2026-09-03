@@ -128,6 +128,20 @@ class ClientEngine2 {
         return instance;
     }
 
+    async restart(query, data = {}, options = {}): Promise<IInstanceData> {
+        const ret = await this.client.put('engine/restart', { query, data, options });
+        if (ret['errors'])
+            throw new Error(ret['errors']);
+        return ret['instance'] as IInstanceData;
+    }
+
+    async get(query): Promise<IInstanceData> {
+        const ret = await this.client.get('engine/get', { query });
+        if (ret['errors'])
+            throw new Error(ret['errors']);
+        return ret['instance'] as IInstanceData;
+    }
+
     async throwMessage(messageId, data = {}, messageMatchingKey = {}, options = {}) {
         const ret = await this.client.post('engine/throwMessage',
              { messageId, data, messageMatchingKey, options });
