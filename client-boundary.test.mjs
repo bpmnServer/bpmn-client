@@ -40,3 +40,18 @@ test('admin clients expose definition administration explicitly', () => {
     assert.ok(new BPMNAdminClient('localhost', 3000, 'key').definitions);
     assert.ok(new BPMNAdminClient2('localhost', 3000, 'key').model);
 });
+
+test('v1 client exposes migrated legacy operations on the authorized contract', async () => {
+    const client = new BPMNClientV1('localhost', 3000, 'key');
+    const calls = [];
+    client.put = async (path, body) => { calls.push(['put', path, body]); return { instance: { id: 1 } }; };
+    client.get = async (path, body) => { calls.push(['get', path, body]); return { instance: { id: 2 } }; };
+
+    await client.engine.restart({ id: 1 }, { approved: true });
+    await client.engine.get({ id: 2 });
+
+    assert.deepEqual(calls, [
+        ['put', 'engine/restart', { query: { id: 1 }, data: { approved: true }, options: {} }],
+        ['get', 'engine/get', { query: { id: 2 } }]
+    ]);
+});

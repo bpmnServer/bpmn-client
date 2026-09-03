@@ -12,6 +12,11 @@ and here
 
 ### Changed
 -->
+## Unreleased — Adopt migrated v1 operations (#5)
+
+- Add authorized v1 client operations for execution lookup and restart.
+- Keep all migrated calls on the canonical `/api/v1` contract.
+
 ## Unreleased — Remove caller-supplied identity (#4)
 
 - Stop serializing workflow principals in request bodies.

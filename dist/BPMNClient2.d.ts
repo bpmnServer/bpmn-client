@@ -21,6 +21,8 @@ declare class ClientEngine2 {
     start(name: any, data?: {}, options?: {}): Promise<IInstanceData>;
     invoke(query: any, data: any, options?: {}): Promise<IInstanceData>;
     assign(query: any, data: any, assignment: any): Promise<IInstanceData>;
+    restart(query: any, data?: {}, options?: {}): Promise<IInstanceData>;
+    get(query: any): Promise<IInstanceData>;
     throwMessage(messageId: any, data?: {}, messageMatchingKey?: {}, options?: {}): Promise<any>;
     throwSignal(signalId: any, data?: {}, messageMatchingKey?: {}, options?: {}): Promise<any>;
 }
