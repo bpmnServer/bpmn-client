@@ -12,6 +12,12 @@ and here
 
 ### Changed
 -->
+## Unreleased — Canonical versioned API client (#3)
+
+- Add `BPMNClientV1` for the canonical `/api/v1` runtime contract.
+- Add `BPMNAdminClientV1` for the canonical `/admin/api/v1` administration contract.
+- Retain the older client classes as compatibility surfaces.
+
 ## Unreleased — Separate runtime and administration clients (#2)
 
 - Keep workflow execution calls on the runtime client.

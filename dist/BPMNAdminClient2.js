@@ -17,7 +17,7 @@ class ClientModel2 {
             method: 'POST',
             host: this.client.host,
             port: this.client.port,
-            path: '/admin/api2/model/import/' + name,
+            path: this.client.basePath + 'model/import/' + name,
             headers: { 'x-api-key': this.client.apiKey },
             maxRedirects: 20,
         };
