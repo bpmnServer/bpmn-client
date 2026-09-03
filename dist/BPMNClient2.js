@@ -4,14 +4,16 @@ class BPMNClient2 extends WebService {
     port;
     apiKey;
     basePath;
+    accessToken;
     engine;
     data;
-    constructor(host, port, apiKey, basePath = '/api2/') {
+    constructor(host, port, apiKey, basePath = '/api2/', accessToken = null) {
         super();
         this.host = host;
         this.port = port;
         this.apiKey = apiKey;
         this.basePath = basePath;
+        this.accessToken = accessToken;
         this.engine = new ClientEngine2(this);
         this.data = new ClientData2(this);
     }
@@ -45,6 +47,8 @@ class BPMNClient2 extends WebService {
             //,
             // "Content-Length": Buffer.byteLength(body)
         };
+        if (this.accessToken)
+            headers['Authorization'] = `Bearer ${this.accessToken}`;
         var options;
         if (params) {
             options = {
@@ -71,8 +75,8 @@ class ClientEngine2 {
     constructor(client) {
         this.client = client;
     }
-    async start(name, data = {}, user, options = {}) {
-        const ret = await this.client.post('engine/start', { name, data, user, options });
+    async start(name, data = {}, options = {}) {
+        const ret = await this.client.post('engine/start', { name, data, options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
@@ -80,8 +84,8 @@ class ClientEngine2 {
         const instance = ret;
         return instance;
     }
-    async invoke(query, data, user, options = {}) {
-        const ret = await this.client.put('engine/invoke', { query, data, user, options });
+    async invoke(query, data, options = {}) {
+        const ret = await this.client.put('engine/invoke', { query, data, options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
@@ -89,8 +93,8 @@ class ClientEngine2 {
         const instance = ret['instance'];
         return instance;
     }
-    async assign(query, data, assignment, user) {
-        const ret = await this.client.put('engine/assign', { query, data, assignment, user });
+    async assign(query, data, assignment) {
+        const ret = await this.client.put('engine/assign', { query, data, assignment });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
@@ -98,16 +102,16 @@ class ClientEngine2 {
         const instance = ret['instance'];
         return instance;
     }
-    async throwMessage(messageId, data = {}, messageMatchingKey = {}, user, options) {
-        const ret = await this.client.post('engine/throwMessage', { "messageId": messageId, "data": data, messageMatchingKey, user, options });
+    async throwMessage(messageId, data = {}, messageMatchingKey = {}, options = {}) {
+        const ret = await this.client.post('engine/throwMessage', { messageId, data, messageMatchingKey, options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
         }
         return ret;
     }
-    async throwSignal(signalId, data = {}, messageMatchingKey = {}, user, options) {
-        const ret = await this.client.post('engine/throwSignal', { "signalId": signalId, "data": data, messageMatchingKey, user, options });
+    async throwSignal(signalId, data = {}, messageMatchingKey = {}, options = {}) {
+        const ret = await this.client.post('engine/throwSignal', { signalId, data, messageMatchingKey, options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
@@ -120,8 +124,8 @@ class ClientData2 {
     constructor(client) {
         this.client = client;
     }
-    async find({ filter, sort, limit, after, projection, lastItem, latestItem, getTotalCount, user }) {
-        var res = await this.client.get('datastore/find', { filter, after, limit, sort, projection, lastItem, latestItem, getTotalCount, user });
+    async find({ filter, sort, limit, after, projection, lastItem, latestItem, getTotalCount }) {
+        var res = await this.client.get('datastore/find', { filter, after, limit, sort, projection, lastItem, latestItem, getTotalCount });
         if (res.error) {
             console.log(res.error);
             throw new Error(res.error);
@@ -129,8 +133,8 @@ class ClientData2 {
         }
         return res;
     }
-    async findItems(query, user) {
-        var res = await this.client.get('data/findItems', { query, user });
+    async findItems(query) {
+        var res = await this.client.get('data/findItems', { query });
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -138,8 +142,8 @@ class ClientData2 {
         const items = res['items'];
         return items;
     }
-    async findInstances(query, user) {
-        const res = await this.client.get('data/findInstances', { query, user });
+    async findInstances(query) {
+        const res = await this.client.get('data/findInstances', { query });
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -147,8 +151,8 @@ class ClientData2 {
         const instances = res['instances'];
         return instances;
     }
-    async deleteInstances(query, user) {
-        return await this.client.del('data/deleteInstances', { query, user });
+    async deleteInstances(query) {
+        return await this.client.del('data/deleteInstances', { query });
     }
 }
 export { BPMNClient2, ClientEngine2, ClientData2 };

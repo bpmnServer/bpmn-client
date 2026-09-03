@@ -7,16 +7,18 @@ class BPMNClient2 extends WebService {
     port;
     apiKey;
     basePath;
+    accessToken;
     engine: ClientEngine2;
     data: ClientData2;
 
-    constructor(host, port, apiKey, basePath = '/api2/') {
+    constructor(host, port, apiKey, basePath = '/api2/', accessToken = null) {
         super();
 
         this.host = host;
         this.port = port;
         this.apiKey = apiKey;
         this.basePath = basePath;
+        this.accessToken = accessToken;
         this.engine = new ClientEngine2(this);
         this.data = new ClientData2(this);
     }
@@ -59,6 +61,8 @@ class BPMNClient2 extends WebService {
             //,
             // "Content-Length": Buffer.byteLength(body)
         };
+        if (this.accessToken)
+            headers['Authorization'] = `Bearer ${this.accessToken}`;
 
 
         var options;
@@ -93,9 +97,9 @@ class ClientEngine2 {
     constructor(client) {
         this.client = client;
     }
-    async start(name, data = {}, user ,options = {}): Promise<IInstanceData> {
+    async start(name, data = {}, options = {}): Promise<IInstanceData> {
         const ret = await this.client.post('engine/start',
-            { name, data, user, options });
+            { name, data, options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
@@ -103,9 +107,9 @@ class ClientEngine2 {
         const instance = ret as IInstanceData;
         return instance;
     }
-    async invoke(query, data, user,options={}): Promise<IInstanceData> {
+    async invoke(query, data, options={}): Promise<IInstanceData> {
         const ret = await this.client.put('engine/invoke',
-             { query, data , user ,options });
+             { query, data, options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
@@ -113,9 +117,9 @@ class ClientEngine2 {
         const instance = ret['instance'] as IInstanceData;
         return instance;
     }
-    async assign(query, data, assignment,user): Promise<IInstanceData> {
+    async assign(query, data, assignment): Promise<IInstanceData> {
         const ret = await this.client.put('engine/assign',
-             { query, data ,assignment, user });
+             { query, data, assignment });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
@@ -124,18 +128,18 @@ class ClientEngine2 {
         return instance;
     }
 
-    async throwMessage(messageId, data = {} , messageMatchingKey = {} ,user, options) {
+    async throwMessage(messageId, data = {}, messageMatchingKey = {}, options = {}) {
         const ret = await this.client.post('engine/throwMessage',
-             { "messageId": messageId, "data": data, messageMatchingKey,user,options });
+             { messageId, data, messageMatchingKey, options });
         if (ret['errors']) {
             console.log(ret['errors']);
             throw new Error(ret['errors']);
         }
         return ret;
     }
-    async throwSignal(signalId, data = {} , messageMatchingKey = {} ,user, options) {
+    async throwSignal(signalId, data = {}, messageMatchingKey = {}, options = {}) {
         const ret = await this.client.post('engine/throwSignal', 
-            { "signalId": signalId, "data": data, messageMatchingKey,user,options });
+            { signalId, data, messageMatchingKey, options });
 
             if (ret['errors']) {
             console.log(ret['errors']);
@@ -159,8 +163,7 @@ class ClientData2 {
         projection,
         lastItem,
 		latestItem,
-        getTotalCount,
-        user}:
+        getTotalCount}:
         {
             filter?: Record<string, any>;
             after?: string;
@@ -170,7 +173,6 @@ class ClientData2 {
             lastItem?: Record<string, any>;
             latestItem?: Record<string,any>;
             getTotalCount?: boolean; // if true, return total count of items in the result set
-            user?:string;
           }            
         )
     : Promise<   { data?: any[];
@@ -178,7 +180,7 @@ class ClientData2 {
                 totalCount?: number;
                 error?: string; }> {
     var res = await this.client.get('datastore/find',
-        {filter,after,limit,sort,projection,lastItem,latestItem,getTotalCount,user}
+        {filter,after,limit,sort,projection,lastItem,latestItem,getTotalCount}
     );
     if (res.error) {
         console.log(res.error);
@@ -190,9 +192,9 @@ class ClientData2 {
 
     }
 
-    async findItems(query,user): Promise<IItemData[]> {
+    async findItems(query): Promise<IItemData[]> {
         var res = await this.client.get('data/findItems', 
-            {query,user});
+            { query });
 
         if (res['errors']) {
             console.log(res['errors']);
@@ -202,9 +204,9 @@ class ClientData2 {
         return items;
 
     }
-    async findInstances(query,user): Promise<IInstanceData[]> {
+    async findInstances(query): Promise<IInstanceData[]> {
         const res = await this.client.get('data/findInstances', 
-            {query,user});
+            { query });
 
         if (res['errors']) {
             console.log(res['errors']);
@@ -213,9 +215,9 @@ class ClientData2 {
         const instances = res['instances'] as IInstanceData[];
         return instances;
     }
-    async deleteInstances(query,user) {
+    async deleteInstances(query) {
         return await this.client.del('data/deleteInstances', 
-            {query,user});
+            { query });
     }
 }
 export { BPMNClient2, ClientEngine2, ClientData2 }
