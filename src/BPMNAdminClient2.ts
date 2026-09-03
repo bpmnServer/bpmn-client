@@ -5,8 +5,8 @@ import { IDefinitionData } from './interfaces/DataObjects.js';
 class BPMNAdminClient2 extends BPMNClient2 {
     model: ClientModel2;
 
-    constructor(host, port, apiKey) {
-        super(host, port, apiKey, '/admin/api2/');
+    constructor(host, port, apiKey, accessToken = null) {
+        super(host, port, apiKey, '/admin/api2/', accessToken);
         this.model = new ClientModel2(this);
     }
 }
@@ -18,7 +18,7 @@ class ClientModel2 {
         this.client = client;
     }
 
-    async import(name, pathToBPMN, pathToSVG = null, user = undefined) {
+    async import(name, pathToBPMN, pathToSVG = null) {
         const options = {
             method: 'POST',
             host: this.client.host,
@@ -33,26 +33,26 @@ class ClientModel2 {
         return result;
     }
 
-    async list(user = undefined): Promise<string[]> {
-        const result = await this.client.get('model/list', { user });
+    async list(): Promise<string[]> {
+        const result = await this.client.get('model/list', {});
         this.checkErrors(result);
         return result as string[];
     }
 
-    async delete(name, user = undefined): Promise<IDefinitionData> {
-        const result = await this.client.post('model/delete/', { name, user });
+    async delete(name): Promise<IDefinitionData> {
+        const result = await this.client.post('model/delete/', { name });
         this.checkErrors(result);
         return result as IDefinitionData;
     }
 
-    async rename(name, newName, user = undefined): Promise<IDefinitionData> {
-        const result = await this.client.post('model/rename/', { name, newName, user });
+    async rename(name, newName): Promise<IDefinitionData> {
+        const result = await this.client.post('model/rename/', { name, newName });
         this.checkErrors(result);
         return result as IDefinitionData;
     }
 
-    async load(name, user = undefined): Promise<IDefinitionData> {
-        const result = await this.client.get(encodeURI('model/load/' + name), { name, user });
+    async load(name): Promise<IDefinitionData> {
+        const result = await this.client.get(encodeURI('model/load/' + name), { name });
         this.checkErrors(result);
         return result as IDefinitionData;
     }

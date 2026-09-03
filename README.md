@@ -21,9 +21,13 @@ import { BPMNClientV1, BPMNAdminClientV1 } from 'bpmn-client';
 const runtime = new BPMNClientV1(host, port, apiKey);
 const admin = new BPMNAdminClientV1(host, port, adminApiKey);
 
-await runtime.engine.start('order-approval', input, user);
+await runtime.engine.start('order-approval', input);
 await admin.model.import('order-approval', './order-approval.bpmn');
 ```
+
+User identity is never accepted as workflow request data. For interactive-user
+authentication, pass a signed access token as the fourth `BPMNClientV1`
+constructor argument; the server application's principal resolver validates it.
 
 # Installation
 

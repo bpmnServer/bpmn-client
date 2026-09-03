@@ -12,6 +12,12 @@ and here
 
 ### Changed
 -->
+## Unreleased — Remove caller-supplied identity (#4)
+
+- Stop serializing workflow principals in request bodies.
+- Allow versioned runtime and administration clients to carry bearer tokens.
+- Leave principal resolution to the trusted server-side integration layer.
+
 ## Unreleased — Canonical versioned API client (#3)
 
 - Add `BPMNClientV1` for the canonical `/api/v1` runtime contract.

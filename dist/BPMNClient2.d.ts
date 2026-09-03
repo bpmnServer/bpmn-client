@@ -5,9 +5,10 @@ declare class BPMNClient2 extends WebService {
     port: any;
     apiKey: any;
     basePath: any;
+    accessToken: any;
     engine: ClientEngine2;
     data: ClientData2;
-    constructor(host: any, port: any, apiKey: any, basePath?: string);
+    constructor(host: any, port: any, apiKey: any, basePath?: string, accessToken?: any);
     get(url: any, params: any): Promise<any>;
     post(url: any, params: any): Promise<any>;
     put(url: any, params: any): Promise<any>;
@@ -17,16 +18,16 @@ declare class BPMNClient2 extends WebService {
 declare class ClientEngine2 {
     private client;
     constructor(client: any);
-    start(name: any, data: {}, user: any, options?: {}): Promise<IInstanceData>;
-    invoke(query: any, data: any, user: any, options?: {}): Promise<IInstanceData>;
-    assign(query: any, data: any, assignment: any, user: any): Promise<IInstanceData>;
-    throwMessage(messageId: any, data: {}, messageMatchingKey: {}, user: any, options: any): Promise<any>;
-    throwSignal(signalId: any, data: {}, messageMatchingKey: {}, user: any, options: any): Promise<any>;
+    start(name: any, data?: {}, options?: {}): Promise<IInstanceData>;
+    invoke(query: any, data: any, options?: {}): Promise<IInstanceData>;
+    assign(query: any, data: any, assignment: any): Promise<IInstanceData>;
+    throwMessage(messageId: any, data?: {}, messageMatchingKey?: {}, options?: {}): Promise<any>;
+    throwSignal(signalId: any, data?: {}, messageMatchingKey?: {}, options?: {}): Promise<any>;
 }
 declare class ClientData2 {
     private client;
     constructor(client: any);
-    find({ filter, sort, limit, after, projection, lastItem, latestItem, getTotalCount, user }: {
+    find({ filter, sort, limit, after, projection, lastItem, latestItem, getTotalCount }: {
         filter?: Record<string, any>;
         after?: string;
         limit?: number;
@@ -35,15 +36,14 @@ declare class ClientData2 {
         lastItem?: Record<string, any>;
         latestItem?: Record<string, any>;
         getTotalCount?: boolean;
-        user?: string;
     }): Promise<{
         data?: any[];
         nextCursor?: string | null;
         totalCount?: number;
         error?: string;
     }>;
-    findItems(query: any, user: any): Promise<IItemData[]>;
-    findInstances(query: any, user: any): Promise<IInstanceData[]>;
-    deleteInstances(query: any, user: any): Promise<any>;
+    findItems(query: any): Promise<IItemData[]>;
+    findInstances(query: any): Promise<IInstanceData[]>;
+    deleteInstances(query: any): Promise<any>;
 }
 export { BPMNClient2, ClientEngine2, ClientData2 };
