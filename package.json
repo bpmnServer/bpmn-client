@@ -17,7 +17,8 @@
     "start": "node --import tsx src/cli.ts",
     "cli": "node --import tsx src/cli.ts",
     "setup": "node --import tsx src/setup.ts",
-    "test": "node --import tsx ./node_modules/mocha/bin/mocha.js --config=test/.mocharc.json"
+    "test": "node --import tsx ./node_modules/mocha/bin/mocha.js --config=test/.mocharc.json",
+    "test:boundary": "node --test client-boundary.test.mjs"
   },
   "description": "Client API for BPMN-Server webservices",
   "keywords": [

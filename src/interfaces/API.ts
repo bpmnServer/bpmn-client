@@ -4,6 +4,9 @@ import { IInstanceData, IItemData , IDefinitionData} from './DataObjects.js';
 export interface IBPMNRequest {
     engine: IEngine;
     datastore: IDatastore;
+}
+
+export interface IBPMNAdminRequest extends IBPMNRequest {
     definitions: IDefinitions;
 }
 

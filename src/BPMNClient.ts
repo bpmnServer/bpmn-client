@@ -1,4 +1,4 @@
-import { IInstanceData, IItemData , IDefinitionData} from './interfaces/DataObjects.js';
+import { IInstanceData, IItemData } from './interfaces/DataObjects.js';
 import {WebService} from './WebService.js';
 
 
@@ -6,19 +6,19 @@ class BPMNClient extends WebService {
     host;
     port;
     apiKey;
+    basePath;
     engine: ClientEngine;
     datastore: ClientDatastore;
-    definitions: ClientDefinitions;
 
-    constructor(host, port, apiKey) {
+    constructor(host, port, apiKey, basePath = '/api/') {
         super();
 
         this.host = host;
         this.port = port;
         this.apiKey = apiKey;
+        this.basePath = basePath;
         this.engine = new ClientEngine(this);
         this.datastore = new ClientDatastore(this);
-        this.definitions = new ClientDefinitions(this);
     }
 
     async get(url, data = {}) {
@@ -67,7 +67,7 @@ class BPMNClient extends WebService {
             options = {
                 host: this.host,
                 port: this.port,
-                path: '/api/' + url,
+                path: this.basePath + url,
                 method: method,
                 headers: headers
             };
@@ -76,7 +76,7 @@ class BPMNClient extends WebService {
             options = {
                 host: this.host,
                 port: this.port,
-                path: '/api/' + url,
+                path: this.basePath + url,
                 method: method
             };
         }
@@ -240,73 +240,4 @@ class ClientDatastore {
         return await this.client.del('datastore/deleteInstances', query);
     }
 }
-class ClientDefinitions {
-    private client: BPMNClient;
-
-    constructor(client) {
-        this.client = client;
-    }
-    
-    async import(name, pathToBPMN,pathToSVG=null) {
-
-        var options = {
-            'method': 'POST',
-            'host': this.client.host,
-            'port': this.client.port,
-            'path': '/api/definitions/import/' + name,
-            'headers': {
-                'x-api-key': this.client.apiKey
-            },
-            'maxRedirects': 20
-        };
-
-        var res = await this.client.upload(name,pathToBPMN,pathToSVG,options);
-        this.checkErrors(res);
-        return res;
-
-    }
-    async list(): Promise<string[]> {
-        var res = await this.client.get('definitions/list', []);
-        if (res['errors']) {
-            console.log(res['errors']);
-            throw new Error(res['errors']);
-        }
-        return res as string[];
-
-    }
-    async delete(name) {
-        const res = await this.client.post('definitions/delete/', { name });
-        if (res['errors']) {
-            console.log(res['errors']);
-            throw new Error(res['errors']);
-        }
-        return res as IDefinitionData;
-
-    }
-    async rename(name,newName) {
-        const res = await this.client.post('definitions/rename/', { name , newName });
-        if (res['errors']) {
-            console.log(res['errors']);
-            throw new Error(res['errors']);
-        }
-        return res as IDefinitionData;
-
-    }
-    async load(name): Promise<IDefinitionData> {
-        const res = await this.client.get(encodeURI('definitions/load/' + name), { name });
-        if (res['errors']) {
-            console.log(res['errors']);
-            throw new Error(res['errors']);
-        }
-        return res as IDefinitionData;
-    }
-    checkErrors(res) {
-        if (res['errors']) {
-            console.log(res['errors']);
-            throw new Error(res['errors']);
-        }
-    }
-}
-
-
-export { BPMNClient , ClientEngine,ClientDatastore , ClientDefinitions}
+export { BPMNClient, ClientEngine, ClientDatastore }

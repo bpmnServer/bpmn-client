@@ -1,4 +1,4 @@
-import { BPMNClient } from './';
+import { BPMNAdminClient } from './';
 
 test1();
 async function test1() {
@@ -6,7 +6,7 @@ async function test1() {
         dotenv.config();
         console.log('env:',process.env.HOST, process.env.PORT, process.env.API_KEY);
 
-        const server1 = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+        const server1 = new BPMNAdminClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
         
         let insts=await server1.datastore.findInstances({},{"name":1,"data":1});
         console.log(insts);
@@ -26,7 +26,7 @@ async function testLong() {
 
         let options={noWait:true};
 
-        const server1 = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+        const server1 = new BPMNAdminClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
         response = await server1.engine.start(name, {caseId: caseId},null,userId);
         console.log(response.id,response);
@@ -54,8 +54,8 @@ async function test() {
 
         let options={noWait:true};
 
-        const server1 = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
-        const server2 = new BPMNClient(process.env.HOST, 3030, process.env.API_KEY);
+        const server1 = new BPMNAdminClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+        const server2 = new BPMNAdminClient(process.env.HOST, 3030, process.env.API_KEY);
 
         response = await server1.engine.start(name, {caseId: caseId},null,userId,options);
         console.log(response.id);
@@ -75,7 +75,7 @@ async function importModel() {
         dotenv.config();
         console.log('env:',process.env.HOST, process.env.PORT, process.env.API_KEY);
 
-        const server = new BPMNClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
+        const server = new BPMNAdminClient(process.env.HOST, process.env.PORT, process.env.API_KEY);
 
     var name = 'test-import';
     var file = '..\\WebApp\\processes\\Trans.bpmn';

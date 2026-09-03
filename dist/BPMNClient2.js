@@ -3,17 +3,17 @@ class BPMNClient2 extends WebService {
     host;
     port;
     apiKey;
+    basePath;
     engine;
     data;
-    model;
-    constructor(host, port, apiKey) {
+    constructor(host, port, apiKey, basePath = '/api2/') {
         super();
         this.host = host;
         this.port = port;
         this.apiKey = apiKey;
+        this.basePath = basePath;
         this.engine = new ClientEngine2(this);
         this.data = new ClientData2(this);
-        this.model = new ClientModel2(this);
     }
     async get(url, params) {
         return await this.request(url, 'GET', params);
@@ -50,7 +50,7 @@ class BPMNClient2 extends WebService {
             options = {
                 host: this.host,
                 port: this.port,
-                path: '/api2/' + url,
+                path: this.basePath + url,
                 method: method,
                 headers: headers
             };
@@ -59,7 +59,7 @@ class BPMNClient2 extends WebService {
             options = {
                 host: this.host,
                 port: this.port,
-                path: '/api2/' + url,
+                path: this.basePath + url,
                 method: method
             };
         }
@@ -151,64 +151,5 @@ class ClientData2 {
         return await this.client.del('data/deleteInstances', { query, user });
     }
 }
-class ClientModel2 {
-    client;
-    constructor(client) {
-        this.client = client;
-    }
-    async import(name, pathToBPMN, pathToSVG = null, user) {
-        var options = {
-            'method': 'POST',
-            'host': this.client.host,
-            'port': this.client.port,
-            'path': '/api/model/import/' + name,
-            'headers': {
-                'x-api-key': this.client.apiKey
-            },
-            'maxRedirects': 20
-        };
-        var res = await this.client.upload(name, pathToBPMN, pathToSVG, options);
-        this.checkErrors(res);
-        return res;
-    }
-    async list() {
-        var res = await this.client.get('model/list', []);
-        if (res['errors']) {
-            console.log(res['errors']);
-            throw new Error(res['errors']);
-        }
-        return res;
-    }
-    async delete(name) {
-        const res = await this.client.post('model/delete/', { name });
-        if (res['errors']) {
-            console.log(res['errors']);
-            throw new Error(res['errors']);
-        }
-        return res;
-    }
-    async rename(name, newName) {
-        const res = await this.client.post('model/rename/', { name, newName });
-        if (res['errors']) {
-            console.log(res['errors']);
-            throw new Error(res['errors']);
-        }
-        return res;
-    }
-    async load(name) {
-        const res = await this.client.get(encodeURI('model/load/' + name), { name });
-        if (res['errors']) {
-            console.log(res['errors']);
-            throw new Error(res['errors']);
-        }
-        return res;
-    }
-    checkErrors(res) {
-        if (res['errors']) {
-            console.log(res['errors']);
-            throw new Error(res['errors']);
-        }
-    }
-}
-export { BPMNClient2, ClientEngine2, ClientData2, ClientModel2 };
+export { BPMNClient2, ClientEngine2, ClientData2 };
 //# sourceMappingURL=BPMNClient2.js.map
