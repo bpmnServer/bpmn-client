@@ -90,3 +90,14 @@ test('an unreachable server rejects with the connection error', { skip }, async 
   const nowhere = new BPMNClient2('127.0.0.1', 1, server.apiKey);
   await assert.rejects(() => nowhere.engine.start(MODEL, {}), /ECONNREFUSED|connect/i);
 });
+
+test('model.list and findStartEvents work with the runtime key', { skip }, async (t) => {
+  // (the client's own HTTP stack: fetch's keep-alive sockets can crash Node on Windows at process.exit)
+  const status = await client.get('model/list', {}).then(() => 200, e => e.status ?? 0);
+  if (status === 404) return t.skip('the server predates runtime model reads (bpmn-web with bpmn-server 3.2)');
+  const names = (await client.model.list()).map(m => m.name ?? m);
+  assert.ok(names.includes(MODEL), names.join(','));
+  const starts = await client.model.findStartEvents();
+  assert.ok(starts.some(e => (e.modelName ?? e.name) === MODEL));
+});
+

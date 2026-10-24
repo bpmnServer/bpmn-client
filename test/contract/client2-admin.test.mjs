@@ -36,9 +36,9 @@ test('model.import uploads a model; load, rename and delete it', { skip }, async
   assert.ok(!(await names()).some(n => n.startsWith('client-model')));
 });
 
-test('model administration needs the admin key', { skip }, async () => {
+test('changing models needs the admin key', { skip }, async () => {
   const runtimeOnly = new BPMNClient2(server.host, server.port, server.apiKey);
-  await assert.rejects(() => runtimeOnly.model.list(), /401/);
+  await assert.rejects(() => runtimeOnly.model.rename(MODEL, 'x'), /401/);
 });
 
 test('data.find pages through instances', { skip }, async () => {

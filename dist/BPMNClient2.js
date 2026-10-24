@@ -183,13 +183,30 @@ class ClientModel2 {
         this.checkErrors(res);
         return res;
     }
-    async list() {
-        var res = await this.client.admin('model/list', 'GET', []);
-        if (res['errors']) {
-            console.log(res['errors']);
-            throw new Error(res['errors']);
+    /**
+     * Reads a model route with the runtime key (bpmn-web >= 3.2 serves model reads on /api2);
+     * an older server only has them under /admin/api2, with the admin key.
+     */
+    async read(route, params = {}) {
+        try {
+            return await this.client.get(route, params);
         }
-        return res;
+        catch (error) {
+            // older servers: 404, or (before API 404s) the UI's login page
+            if (error.status === 404 || error.isWebPage)
+                return await this.client.admin(route, 'GET', params);
+            throw error;
+        }
+    }
+    async list() {
+        return await this.read('model/list');
+    }
+    /** Start events the service account may use (candidate rules of the start event apply). */
+    async findStartEvents(query = {}) {
+        return await this.read('model/findStartEvents', { query });
+    }
+    async findEvents(query = {}) {
+        return await this.read('model/findEvents', { query });
     }
     async delete(name) {
         const res = await this.client.admin('model/delete', 'POST', { name });

@@ -75,6 +75,7 @@ class WebService {
         if (typeof data === 'string' && /^\s*<(!doctype|html)/i.test(data)) {
             const error: any = new Error('The server answered with a web page instead of the API: check the host, port and path');
             error.isServiceError = true;
+            error.isWebPage = true;
             throw error;
         }
         return data;

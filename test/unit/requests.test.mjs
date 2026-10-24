@@ -60,11 +60,26 @@ test('BPMNClient2 engine and data calls: method, path, key, body', async () => {
   }
 });
 
-test('BPMNClient2 model calls go to /admin/api2 with the admin key', async () => {
+test('model reads use the runtime API, falling back to /admin/api2 on older servers', async () => {
   const c = client2();
-  reply = () => ({ body: [] });
-  await c.model.list();
-  assert.deepEqual([last().method, last().path, last().key], ['GET', '/admin/api2/model/list', ADMIN_KEY]);
+  reply = () => ({ body: [{ name: 'm' }] });
+  assert.deepEqual(await c.model.list(), [{ name: 'm' }]);
+  assert.deepEqual([last().method, last().path, last().key], ['GET', '/api2/model/list', API_KEY]);
+  await c.model.findStartEvents({ name: 'm' });
+  assert.deepEqual([last().path, last().body], ['/api2/model/findStartEvents', { query: { name: 'm' } }]);
+
+  for (const older of [{ status: 404, body: { errors: 'No API route' } }, { body: '<!DOCTYPE html><html>login</html>', type: 'text/html' }]) {
+    requests = [];
+    reply = r => r.path.startsWith('/admin/') ? { body: [{ name: 'old' }] } : older;
+    assert.deepEqual(await c.model.list(), [{ name: 'old' }]);
+    assert.deepEqual(requests.map(r => `${r.path} ${r.key}`), ['/api2/model/list runtime-key', '/admin/api2/model/list admin-key']);
+  }
+  reply = () => ({ status: 401, body: { errors: 'bad key' } });
+  await assert.rejects(() => c.model.list(), /401 bad key/, 'other failures are not retried');
+});
+
+test('BPMNClient2 model changes go to /admin/api2 with the admin key', async () => {
+  const c = client2();
   reply = () => ({ body: {} });
   await c.model.rename('a', 'b');
   assert.deepEqual([last().method, last().path, last().key, last().body], ['POST', '/admin/api2/model/rename', ADMIN_KEY, { name: 'a', newName: 'b' }]);
@@ -120,8 +135,8 @@ test('BPMNClient (legacy) calls: method, path, key', async () => {
 
 test('the admin key defaults to the API key', async () => {
   const c = new BPMNClient2('127.0.0.1', port, API_KEY);
-  reply = () => ({ body: [] });
-  await c.model.list();
+  reply = () => ({ body: {} });
+  await c.model.rename('a', 'b');
   assert.equal(last().key, API_KEY);
 });
 

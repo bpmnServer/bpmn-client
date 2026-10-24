@@ -61,7 +61,15 @@ declare class ClientModel2 {
     private client;
     constructor(client: any);
     import(name: any, pathToBPMN: any, pathToSVG: any, user: any): Promise<any>;
+    /**
+     * Reads a model route with the runtime key (bpmn-web >= 3.2 serves model reads on /api2);
+     * an older server only has them under /admin/api2, with the admin key.
+     */
+    private read;
     list(): Promise<string[]>;
+    /** Start events the service account may use (candidate rules of the start event apply). */
+    findStartEvents(query?: {}): Promise<any>;
+    findEvents(query?: {}): Promise<any>;
     delete(name: any): Promise<IDefinitionData>;
     rename(name: any, newName: any): Promise<IDefinitionData>;
     load(name: any): Promise<IDefinitionData>;
