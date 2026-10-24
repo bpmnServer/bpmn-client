@@ -167,3 +167,11 @@ test('successful answers come back as the server sent them', async () => {
   reply = () => ({ body: { errors: undefined, instance: { id: 'i1', status: 'end' } } });
   assert.deepEqual(await client2().engine.invoke({}, {}), { id: 'i1', status: 'end' });
 });
+
+test('an empty errors list is not a failure', async () => {
+  reply = () => ({ body: { errors: [], items: [{ id: 'a' }] } });
+  assert.deepEqual(await client2().data.findItems({}), [{ id: 'a' }]);
+  reply = () => ({ body: { errors: ['first problem'] } });
+  await assert.rejects(() => client2().data.findItems({}), /first problem/);
+});
+

@@ -53,6 +53,9 @@ class WebService {
      */
     static checkResult(data) {
         if (data && typeof data === 'object' && !Array.isArray(data)) {
+            // some answers carry errors: [] on success; drop it so no caller mistakes it for a failure
+            if (Array.isArray(data.errors) && data.errors.length === 0)
+                delete data.errors;
             const failure = data.errors || data.error;
             if (failure) {
                 const error = new Error(typeof failure === 'string' ? failure : JSON.stringify(failure));
