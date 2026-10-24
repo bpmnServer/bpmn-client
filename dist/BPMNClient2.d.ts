@@ -4,15 +4,26 @@ declare class BPMNClient2 extends WebService {
     host: any;
     port: any;
     apiKey: any;
+    /** Key of the server's administration API (ADMIN_API_KEY), for model administration. */
+    adminApiKey: any;
     engine: ClientEngine2;
     data: ClientData2;
     model: ClientModel2;
-    constructor(host: any, port: any, apiKey: any);
+    /**
+     * @param apiKey   the server's API_KEY
+     * @param options  adminApiKey: the server's ADMIN_API_KEY; model administration is served under
+     *                 /admin/api2 with it (defaults to apiKey)
+     */
+    constructor(host: any, port: any, apiKey: any, options?: {
+        adminApiKey?: string;
+    });
     get(url: any, params: any): Promise<any>;
     post(url: any, params: any): Promise<any>;
     put(url: any, params: any): Promise<any>;
+    /** A call to the administration API (/admin/...), with the admin key. */
+    admin(url: any, method: any, params?: {}): Promise<any>;
     del(url: any, params: any): Promise<any>;
-    request(url: any, method: any, params: any): Promise<any>;
+    request(url: any, method: any, params: any, admin?: boolean): Promise<any>;
 }
 declare class ClientEngine2 {
     private client;

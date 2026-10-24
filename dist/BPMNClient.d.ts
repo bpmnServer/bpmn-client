@@ -4,15 +4,26 @@ declare class BPMNClient extends WebService {
     host: any;
     port: any;
     apiKey: any;
+    /** Key of the server's administration API (ADMIN_API_KEY), for model administration. */
+    adminApiKey: any;
     engine: ClientEngine;
     datastore: ClientDatastore;
     definitions: ClientDefinitions;
-    constructor(host: any, port: any, apiKey: any);
+    /**
+     * @param apiKey   the server's API_KEY
+     * @param options  adminApiKey: the server's ADMIN_API_KEY; model administration is served under
+     *                 /admin/api with it (defaults to apiKey)
+     */
+    constructor(host: any, port: any, apiKey: any, options?: {
+        adminApiKey?: string;
+    });
     get(url: any, data?: {}): Promise<any>;
     post(url: any, data?: {}): Promise<any>;
     put(url: any, data?: {}): Promise<any>;
+    /** A call to the administration API (/admin/...), with the admin key. */
+    admin(url: any, method: any, params?: {}): Promise<any>;
     del(url: any, data?: {}): Promise<any>;
-    request(url: any, method: any, params: any): Promise<any>;
+    request(url: any, method: any, params: any, admin?: boolean): Promise<any>;
 }
 declare class ClientEngine {
     private client;
@@ -56,7 +67,8 @@ declare class ClientDefinitions {
     list(): Promise<string[]>;
     delete(name: any): Promise<IDefinitionData>;
     rename(name: any, newName: any): Promise<IDefinitionData>;
-    load(name: any): Promise<IDefinitionData>;
+    /** The model's BPMN XML source (the legacy API returns the source, /api2 the parsed definition). */
+    load(name: any): Promise<string>;
     checkErrors(res: any): void;
 }
 export { BPMNClient, ClientEngine, ClientDatastore, ClientDefinitions };

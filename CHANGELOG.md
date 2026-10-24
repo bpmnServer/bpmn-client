@@ -12,6 +12,24 @@ and here
 
 ### Changed
 -->
+## Release 3.1.0 -- 2026-10-24
+Aligns the client with bpmn-web/bpmn-server 3.x; found by the new contract tests.
+### Fixed
+- Failed calls reject with the server's message instead of resolving `undefined` (which made
+  callers fail with "Cannot read properties of undefined"): HTTP errors (`401 ...`, `403 ...`),
+  failures in a 200 answer (`{ errors }` and `{ error }`; `engine.start` reports `{ error }`), a web
+  page instead of the API, and connection errors.
+- `BPMNClient2.data.findItems` posts (the server's `/api2/data/findItems` is POST); it returned nothing.
+- Model administration goes where the server serves it: `BPMNClient2.model.*` to `/admin/api2/model/*`
+  (import was sent to `/api/model/import`), `BPMNClient.definitions.*` and
+  `datastore.deleteInstances` to `/admin/api/*`.
+- `BPMNClient.definitions.load` is typed as returning the XML source, which the legacy API returns.
+### Added
+- `new BPMNClient2(host, port, apiKey, { adminApiKey })` (and `BPMNClient`): the key of the
+  server's administration API; defaults to `apiKey`.
+- Tests: `test/unit` (request shapes and failures against a recording server) and `test/contract`
+  (every method against a real bpmn-web). `npm test` runs both; the older scenarios are `npm run test:live`.
+
 ## Release 2.2.4 -- 2024-05
 - Fix api dataStore/findInstances(query,projection)
 ## Release 2.1.5 -- 2024-03
