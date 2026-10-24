@@ -25,6 +25,9 @@ Aligns the client with bpmn-web/bpmn-server 3.x; found by the new contract tests
   `datastore.deleteInstances` to `/admin/api/*`.
 - `BPMNClient.definitions.load` is typed as returning the XML source, which the legacy API returns.
 ### Added
+- `BPMNClient2.model.list`, `findStartEvents`, `findEvents` read with the runtime key on servers that
+  serve model reads on `/api2` (bpmn-web with bpmn-server 3.2), else from `/admin/api2` with the admin key.
+- An empty `errors: []` in an answer is not a failure.
 - `new BPMNClient2(host, port, apiKey, { adminApiKey })` (and `BPMNClient`): the key of the
   server's administration API; defaults to `apiKey`.
 - Tests: `test/unit` (request shapes and failures against a recording server) and `test/contract`
