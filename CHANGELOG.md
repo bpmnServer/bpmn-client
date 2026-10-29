@@ -12,8 +12,9 @@ and here
 
 ### Changed
 -->
-## Release 3.1.0 -- 2026-10-24
-Aligns the client with bpmn-web/bpmn-server 3.x; found by the new contract tests.
+## Release 3.1.0 -- 2026-10-29
+Aligns the client with bpmn-web/bpmn-server 3.x; found by the new contract tests. Verified against
+bpmn-web on bpmn-server 3.2.0 (runtime model reads: `model.list`, `findStartEvents`, `findEvents`).
 ### Fixed
 - Failed calls reject with the server's message instead of resolving `undefined` (which made
   callers fail with "Cannot read properties of undefined"): HTTP errors (`401 ...`, `403 ...`),
