@@ -6,16 +6,24 @@ class BPMNClient extends WebService {
     host;
     port;
     apiKey;
+    /** Key of the server's administration API (ADMIN_API_KEY), for model administration. */
+    adminApiKey;
     engine: ClientEngine;
     datastore: ClientDatastore;
     definitions: ClientDefinitions;
 
-    constructor(host, port, apiKey) {
+    /**
+     * @param apiKey   the server's API_KEY
+     * @param options  adminApiKey: the server's ADMIN_API_KEY; model administration is served under
+     *                 /admin/api with it (defaults to apiKey)
+     */
+    constructor(host, port, apiKey, options: { adminApiKey?: string } = {}) {
         super();
 
         this.host = host;
         this.port = port;
         this.apiKey = apiKey;
+        this.adminApiKey = options.adminApiKey ?? apiKey;
         this.engine = new ClientEngine(this);
         this.datastore = new ClientDatastore(this);
         this.definitions = new ClientDefinitions(this);
@@ -33,12 +41,16 @@ class BPMNClient extends WebService {
         return await this.request(url, 'PUT', data);
 
     }
+    /** A call to the administration API (/admin/...), with the admin key. */
+    async admin(url, method, params = {}) {
+        return await this.request(url, method, params, true);
+    }
     async del(url, data = {}) {
         return await this.request(url, 'DELETE', data);
 
     }
 
-    async request(url, method, params) {
+    async request(url, method, params, admin = false) {
 
         var body = JSON.stringify(params);
         var size = Buffer.byteLength(body);
@@ -51,7 +63,7 @@ class BPMNClient extends WebService {
 
         var headers = {
             "Content-Type": contentType ,
-            "x-api-key": this.apiKey,
+            "x-api-key": admin ? this.adminApiKey : this.apiKey,
             "Accept": "*/*",
             //                        "User-Agent": "PostmanRuntime/ 7.26.8",
             //                        "Accept-Encoding": "gzip, deflate, br",
@@ -67,7 +79,7 @@ class BPMNClient extends WebService {
             options = {
                 host: this.host,
                 port: this.port,
-                path: '/api/' + url,
+                path: (admin ? '/admin/api/' : '/api/') + url,
                 method: method,
                 headers: headers
             };
@@ -76,7 +88,7 @@ class BPMNClient extends WebService {
             options = {
                 host: this.host,
                 port: this.port,
-                path: '/api/' + url,
+                path: (admin ? '/admin/api/' : '/api/') + url,
                 method: method
             };
         }
@@ -237,7 +249,7 @@ class ClientDatastore {
         return instances;
     }
     async deleteInstances(query) {
-        return await this.client.del('datastore/deleteInstances', query);
+        return await this.client.admin('datastore/deleteInstances', 'DELETE', query);   // /admin/api
     }
 }
 class ClientDefinitions {
@@ -253,9 +265,9 @@ class ClientDefinitions {
             'method': 'POST',
             'host': this.client.host,
             'port': this.client.port,
-            'path': '/api/definitions/import/' + name,
+            'path': '/admin/api/definitions/import/' + encodeURIComponent(name),
             'headers': {
-                'x-api-key': this.client.apiKey
+                'x-api-key': this.client.adminApiKey
             },
             'maxRedirects': 20
         };
@@ -266,7 +278,7 @@ class ClientDefinitions {
 
     }
     async list(): Promise<string[]> {
-        var res = await this.client.get('definitions/list', []);
+        var res = await this.client.admin('definitions/list', 'GET', []);
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -275,7 +287,7 @@ class ClientDefinitions {
 
     }
     async delete(name) {
-        const res = await this.client.post('definitions/delete/', { name });
+        const res = await this.client.admin('definitions/delete', 'POST', { name });
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -284,7 +296,7 @@ class ClientDefinitions {
 
     }
     async rename(name,newName) {
-        const res = await this.client.post('definitions/rename/', { name , newName });
+        const res = await this.client.admin('definitions/rename', 'POST', { name , newName });
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -292,13 +304,14 @@ class ClientDefinitions {
         return res as IDefinitionData;
 
     }
-    async load(name): Promise<IDefinitionData> {
-        const res = await this.client.get(encodeURI('definitions/load/' + name), { name });
+    /** The model's BPMN XML source (the legacy API returns the source, /api2 the parsed definition). */
+    async load(name): Promise<string> {
+        const res = await this.client.admin(encodeURI('definitions/load/' + name), 'GET', { name });
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
         }
-        return res as IDefinitionData;
+        return res as string;
     }
     checkErrors(res) {
         if (res['errors']) {

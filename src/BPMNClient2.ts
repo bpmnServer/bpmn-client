@@ -6,16 +6,24 @@ class BPMNClient2 extends WebService {
     host;
     port;
     apiKey;
+    /** Key of the server's administration API (ADMIN_API_KEY), for model administration. */
+    adminApiKey;
     engine: ClientEngine2;
     data: ClientData2;
     model: ClientModel2;
 
-    constructor(host, port, apiKey) {
+    /**
+     * @param apiKey   the server's API_KEY
+     * @param options  adminApiKey: the server's ADMIN_API_KEY; model administration is served under
+     *                 /admin/api2 with it (defaults to apiKey)
+     */
+    constructor(host, port, apiKey, options: { adminApiKey?: string } = {}) {
         super();
 
         this.host = host;
         this.port = port;
         this.apiKey = apiKey;
+        this.adminApiKey = options.adminApiKey ?? apiKey;
         this.engine = new ClientEngine2(this);
         this.data = new ClientData2(this);
         this.model = new ClientModel2(this);
@@ -33,12 +41,16 @@ class BPMNClient2 extends WebService {
         return await this.request(url, 'PUT', params);
 
     }
+    /** A call to the administration API (/admin/...), with the admin key. */
+    async admin(url, method, params = {}) {
+        return await this.request(url, method, params, true);
+    }
     async del(url, params) {
         return await this.request(url, 'DELETE', params);
 
     }
 
-    async request(url, method, params) {
+    async request(url, method, params, admin = false) {
 
         var body = JSON.stringify(params);
         var size = Buffer.byteLength(body);
@@ -51,7 +63,7 @@ class BPMNClient2 extends WebService {
 
         var headers = {
             "Content-Type": contentType ,
-            "x-api-key": this.apiKey,
+            "x-api-key": admin ? this.adminApiKey : this.apiKey,
             "Accept": "*/*",
             //                        "User-Agent": "PostmanRuntime/ 7.26.8",
             //                        "Accept-Encoding": "gzip, deflate, br",
@@ -67,7 +79,7 @@ class BPMNClient2 extends WebService {
             options = {
                 host: this.host,
                 port: this.port,
-                path: '/api2/' + url,
+                path: (admin ? '/admin/api2/' : '/api2/') + url,
                 method: method,
                 headers: headers
             };
@@ -76,7 +88,7 @@ class BPMNClient2 extends WebService {
             options = {
                 host: this.host,
                 port: this.port,
-                path: '/api2/' + url,
+                path: (admin ? '/admin/api2/' : '/api2/') + url,
                 method: method
             };
         }
@@ -191,7 +203,7 @@ class ClientData2 {
     }
 
     async findItems(query,user): Promise<IItemData[]> {
-        var res = await this.client.get('data/findItems', 
+        var res = await this.client.post('data/findItems', 
             {query,user});
 
         if (res['errors']) {
@@ -231,9 +243,9 @@ class ClientModel2 {
             'method': 'POST',
             'host': this.client.host,
             'port': this.client.port,
-            'path': '/api/model/import/' + name,
+            'path': '/admin/api2/model/import/' + encodeURIComponent(name),
             'headers': {
-                'x-api-key': this.client.apiKey
+                'x-api-key': this.client.adminApiKey
             },
             'maxRedirects': 20
         };
@@ -243,17 +255,33 @@ class ClientModel2 {
         return res;
 
     }
-    async list(): Promise<string[]> {
-        var res = await this.client.get('model/list', []);
-        if (res['errors']) {
-            console.log(res['errors']);
-            throw new Error(res['errors']);
+    /**
+     * Reads a model route with the runtime key (bpmn-web >= 3.2 serves model reads on /api2);
+     * an older server only has them under /admin/api2, with the admin key.
+     */
+    private async read(route, params = {}) {
+        try {
+            return await this.client.get(route, params);
         }
-        return res as string[];
-
+        catch (error) {
+            // older servers: 404, or (before API 404s) the UI's login page
+            if (error.status === 404 || error.isWebPage)
+                return await this.client.admin(route, 'GET', params);
+            throw error;
+        }
+    }
+    async list(): Promise<string[]> {
+        return await this.read('model/list') as string[];
+    }
+    /** Start events the service account may use (candidate rules of the start event apply). */
+    async findStartEvents(query = {}) {
+        return await this.read('model/findStartEvents', { query });
+    }
+    async findEvents(query = {}) {
+        return await this.read('model/findEvents', { query });
     }
     async delete(name) {
-        const res = await this.client.post('model/delete/', { name });
+        const res = await this.client.admin('model/delete', 'POST', { name });
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -262,7 +290,7 @@ class ClientModel2 {
 
     }
     async rename(name,newName) {
-        const res = await this.client.post('model/rename/', { name , newName });
+        const res = await this.client.admin('model/rename', 'POST', { name , newName });
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
@@ -271,7 +299,7 @@ class ClientModel2 {
 
     }
     async load(name): Promise<IDefinitionData> {
-        const res = await this.client.get(encodeURI('model/load/' + name), { name });
+        const res = await this.client.admin(encodeURI('model/load/' + name), 'GET', { name });
         if (res['errors']) {
             console.log(res['errors']);
             throw new Error(res['errors']);
